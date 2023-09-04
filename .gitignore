@@ -1,5 +1,4 @@
 .DS_Store
-output/
 __commit.py
 __`git commit.command
 __`Initiate venv.command
