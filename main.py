@@ -1,7 +1,7 @@
 import json
 import itertools
 
-from __data import value, items, craftables, rank, permutation
+from input.__data import value, items, craftables, rank, permutation
 
 def minmax(low, num, high):
     return max(min(high, num), low)
