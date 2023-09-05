@@ -5,8 +5,15 @@ from input.__data import value, items, craftables, permutation
 from services.__tk_init import tk_init
 
 
-def minmax(low, num, high):
+def clamp(low, num, high):
     return max(min(high, num), low)
+
+
+def reduce_zip(z):
+    temp = set()
+    for i in z:
+        temp.add(frozenset(i))
+    return temp
 
 
 def sum_score(feed_list):
@@ -15,7 +22,7 @@ def sum_score(feed_list):
         total = [total[i] + feed[1] * feed[0][3][i]
                  for i in range(len(feed[0][3]))]
 
-    total = [minmax(0, 20 + t, 100) for t in total]
+    total = [clamp(0, 20 + t, 100) for t in total]
     return total
 
 
@@ -85,11 +92,15 @@ def run():
                     score_2 += multiplier * category_scores[2]
 
                 item_category_rank_matrix.append(
-                    [name, categories, rank_name, [score_0, score_1, score_2]])
+                    (name, tuple(categories), rank_name, (score_0, score_1, score_2)))
 
+    if not ordered:
+        target.sort()
     for p in permutation:
         item_permutation = [list(zip(i, p)) for i in itertools.permutations(
             item_category_rank_matrix, len(p))]
+
+        item_permutation = reduce_zip(item_permutation)
 
         for item_combo in item_permutation:
             total_score = sum_score(item_combo)
@@ -97,7 +108,6 @@ def run():
             total_score_sort = total_score[:]
             if not ordered:
                 total_score_sort.sort()
-                target.sort()
 
             if total_score_sort == target:
                 print_result(item_combo, total_score)
