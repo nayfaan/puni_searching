@@ -1,0 +1,43 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='index.js')}}" defer></script>
+</head>
+
+<body>
+    <form method="POST">
+        <div>Duplicable only?
+            <input type="checkbox" id="craftable_only" name="craftable_only" {{craftable_state}}>
+        </div>
+
+        <div>Max only?
+            <input type="checkbox" id="best_only" name="best_only" {{best_state}}>
+        </div>
+
+        <table>
+            <tr>
+                <td><label for="const_">Const.</label></td>
+                <td><label for="luster">Luster</label></td>
+                <td><label for="mood">Mood</label></td>
+            </tr>
+            <tr>
+                <td><input type="number" id="const_" name="const_" value="100" min="0" max="100" step="1"></td>
+                <td><input type="number" id="luster" name="luster" value="100" min="0" max="100" step="1"></td>
+                <td><input type="number" id="mood" name="mood" value="94" min="0" max="100" step="1"></td>
+            </tr>
+        </table>
+
+        <div>Need to be ordered?
+            <input type="checkbox" id="ordered" name="ordered" {{ordered_state}}>
+        </div>
+
+        <button type="submit" id="submit">Submit</button>
+    </form>
+    <br><br>
+    <div id="results">{{results}}</div>
+
+</body>
+
+</html>
