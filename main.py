@@ -95,8 +95,6 @@ def zipPerm(puni_target, ordered, show_icons, permutation, item_category_rank_ma
             total_score_sort = total_score[:]
             if not ordered:
                 total_score_sort.sort()
-                
-            update_load(total_score)
 
             if total_score_sort == puni_target:
                 update_load(print_result(item_combo, total_score, show_icons))
@@ -127,6 +125,7 @@ def index():
     elif request.method == "POST":
         turbo.push(turbo.replace(
             Markup("<tbody id='results'></tbody>"), 'results'))
+        update_load("TEST VERCEL")
 
         const_ = int(request.form.get('const_'))
         luster = int(request.form.get('luster'))
