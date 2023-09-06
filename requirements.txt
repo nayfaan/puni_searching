@@ -1,1 +1,2 @@
 Flask==2.3.3
+turbo-flask==0.8.4

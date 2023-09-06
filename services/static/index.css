@@ -5,3 +5,26 @@
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
 }
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 25vw;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 0.4em;
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext,
+.tooltip:active .tooltiptext {
+    visibility: visible;
+}

@@ -1,18 +1,23 @@
 <html>
 
 <head>
+    {{ turbo() }}
     <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body>
     <form method="POST">
-        <div>Duplicable only?
-            <input type="checkbox" id="craftable_only" name="craftable_only" {{craftable_state}}>
+        <div>Duplicable only? <input type="checkbox" id="craftable_only" name="craftable_only" {{craftable_state}}>
+            <span class="tooltip">(?)
+                <span class="tooltiptext">Only use items that can be duplicated with gems</span>
+            </span>
         </div>
 
-        <div>Max only?
-            <input type="checkbox" id="best_only" name="best_only" {{best_state}}>
+        <div>Max only? <input type="checkbox" id="best_only" name="best_only" {{best_state}}>
+            <span class="tooltip">(?)
+                <span class="tooltiptext">Only use items that are rank (S) and has all possible attributes added</span>
+            </span>
         </div>
 
         <table>
@@ -28,14 +33,31 @@
             </tr>
         </table>
 
-        <div>Need to be ordered?
-            <input type="checkbox" id="ordered" name="ordered" {{ordered_state}}>
+        <div>Stats need to be ordered? <input type="checkbox" id="ordered" name="ordered" {{ordered_state}}>
+            <span class="tooltip">(?)
+                <span class="tooltiptext">Does the order of which stat has which number matter? Or is it ok that as long
+                    as all three numbers appear in whichever stat?</span>
+            </span>
         </div>
 
         <button type="submit" id="submit">Submit</button>
     </form>
     <br><br>
-    <div id="results">{{results}}</div>
+    <div id="results-table">
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">Count</th>
+                    <th>Img.</th>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th colspan="2">Add. Attr.</th>
+                </tr>
+            </thead>
+            <tbody id="results">
+            </tbody>
+        </table>
+    </div>
 
 </body>
 
