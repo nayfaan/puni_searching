@@ -95,6 +95,8 @@ def zipPerm(puni_target, ordered, show_icons, permutation, item_category_rank_ma
             total_score_sort = total_score[:]
             if not ordered:
                 total_score_sort.sort()
+                
+            update_load(total_score)
 
             if total_score_sort == puni_target:
                 update_load(print_result(item_combo, total_score, show_icons))
