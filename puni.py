@@ -117,4 +117,7 @@ def run(settings):
 
 
 if __name__ == "__main__":
-    run()
+    from services.__tk_init import tk_init
+    settings = tk_init()
+    
+    print(run(settings))
