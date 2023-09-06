@@ -3,9 +3,6 @@ __commit.py
 __`git commit.command
 __`Initiate venv.command
 services/__tk_init.py
-freeze.py
-build
-build/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

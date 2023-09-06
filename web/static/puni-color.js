@@ -39,7 +39,7 @@ function update_puni_colors() {
 
     if ($("#puni-color").html() != color) {
         $("#puni-color").html(color);
-        $("#puni-img").attr("src", "images/punis/" + color.toLowerCase() + ".webp");
+        $("#puni-img").attr("src", "web/static/images/punis/" + color.toLowerCase() + ".webp");
     }
 }
 
