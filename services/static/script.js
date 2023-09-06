@@ -37,7 +37,10 @@ function update_puni_colors() {
     let fit_color = check_color_range(puni_stats);
     let color = last_color(fit_color);
 
-    $("#puni-color").html(color);
+    if ($("#puni-color").html() != color) {
+        $("#puni-color").html(color);
+        $("#puni-img").attr("src", "images/punis/" + color.toLowerCase() + ".webp");
+    }
 }
 
 const puni_colors = {
