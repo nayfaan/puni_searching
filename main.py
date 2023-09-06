@@ -103,7 +103,7 @@ def zipPerm(puni_target, ordered, show_icons, permutation, item_category_rank_ma
 app = Flask(__name__,
             static_url_path="",
             static_folder="services/static",
-            template_folder="services/template")
+            template_folder="")
 
 # Initiate Turbo-Flask
 turbo = Turbo(app)
