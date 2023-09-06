@@ -28,3 +28,7 @@
 .tooltip:active .tooltiptext {
     visibility: visible;
 }
+
+.item_thumb {
+    height: 1em;
+}
