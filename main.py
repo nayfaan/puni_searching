@@ -125,7 +125,6 @@ def index():
     elif request.method == "POST":
         turbo.push(turbo.replace(
             Markup("<tbody id='results'></tbody>"), 'results'))
-        update_load("TEST VERCEL")
 
         const_ = int(request.form.get('const_'))
         luster = int(request.form.get('luster'))
