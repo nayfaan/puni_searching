@@ -28,9 +28,9 @@ function last_color(fit_color) {
 }
 
 function update_puni_colors() {
-    let const_val = $("#const_").val();
-    let luster_val = $("#luster").val();
-    let mood_val = $("#mood").val();
+    let const_val = parseInt($("#const_").val());
+    let luster_val = parseInt($("#luster").val());
+    let mood_val = parseInt($("#mood").val());
 
     let puni_stats = [const_val, luster_val, mood_val];
 

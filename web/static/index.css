@@ -29,6 +29,19 @@
     visibility: visible;
 }
 
+.hidden_btn {
+    display: none;
+}
+
+.shown_btn {
+    display: inherit;
+}
+
+#abort{
+    background-color: red;
+    color: white;
+}
+
 .item_thumb {
     height: 1em;
 }

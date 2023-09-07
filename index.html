@@ -2,17 +2,26 @@
 
 <head>
     <link rel="stylesheet" href="/web/static/index.css">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/web/static/data.js" defer></script>
     <script type="text/javascript" src="/web/static/puni-color.js" defer></script>
+    <script type="text/javascript" src="/web/static/index.js" defer></script>
+
     <link rel="icon" type="image/png" href="images/favicon.png?v=1.0">
+
     <title>Atelier Ryza 1 | Puni Raising Stats Calculator</title>
+
     <meta name="Keywords" content="Atelier Ryza, Atelier Ryza 1, puni, puni raising, puni feeding">
     <meta name="Description"
         content="An application to generate items to feed the puni in Atelier Ryza 1 to achieve a specific stat.">
 </head>
 
 <body>
-    <div id="intro"><strong>Note:</strong> this application takes a long time to run to completion, but it should be
+    <div id="intro"><strong>Note:</strong> this application uses javascript (ES6) to generate results. Please ensure you
+        haven't disabled it when using this application.
+        <br>
+        <strong>Note:</strong> this application takes a long time to run to completion, but it should be
         able to give you partial results quickly (assuming that the combo you asked for exists).
         <br>
         It is highly recommended that you turn on "Duplicable only" and "Max only" to reduce the loadtime.
@@ -25,50 +34,55 @@
             1</strong> to achieve a specific stat.
     </div>
     <hr>
-    <form method="POST">
-        <div>Duplicable only? <input type="checkbox" id="craftable_only" name="craftable_only" {{craftable_state}}>
-            <span class="tooltip">(?)
-                <span class="tooltiptext">Only use items that can be duplicated with gems</span>
-            </span>
-        </div>
 
-        <div>Max only? <input type="checkbox" id="best_only" name="best_only" {{best_state}}>
-            <span class="tooltip">(?)
-                <span class="tooltiptext">Only use items that are rank (S) and has all possible attributes added</span>
-            </span>
-        </div>
+    <div>Duplicable only? <input type="checkbox" id="craftable_only" checked>
+        <span class="tooltip">(?)
+            <span class="tooltiptext">Only use items that can be duplicated with gems</span>
+        </span>
+    </div>
 
-        <table id="puni-stats-table">
-            <tr>
-                <td><label for="const_"><u>Const.</u></label></td>
-                <td><label for="luster"><u>Luster</u></label></td>
-                <td><label for="mood"><u>Mood</u></label></td>
-                <td rowspan="2"> = <img id="puni-img" src="" style="height: 100%;"> <strong><span id="puni-color"></span></strong> Puni</td>
-            </tr>
-            <tr>
-                <td><input type="number" id="const_" name="const_" value="100" min="0" max="100" step="1"></td>
-                <td><input type="number" id="luster" name="luster" value="100" min="0" max="100" step="1"></td>
-                <td><input type="number" id="mood" name="mood" value="94" min="0" max="100" step="1"></td>
-            </tr>
-        </table>
+    <div>Max only? <input type="checkbox" id="best_only" checked>
+    <!-- <div>Max only? <input type="checkbox" id="best_only"> -->
+        <span class="tooltip">(?)
+            <span class="tooltiptext">Only use items that are rank (S) and has all possible attributes added</span>
+        </span>
+    </div>
 
-        <div>Stats need to be ordered? <input type="checkbox" id="ordered" name="ordered" {{ordered_state}}>
-            <span class="tooltip">(?)
-                <span class="tooltiptext">Does the order of which stat has which number matter? Or is it ok that as long
-                    as all three numbers appear in whichever stat?</span>
-            </span>
-        </div>
+    <table id="puni-stats-table">
+        <tr>
+            <td><u>Const.</u></td>
+            <td><u>Luster</u></td>
+            <td><u>Mood</u></td>
+            <td rowspan="2"> = <img id="puni-img" src="" style="height: 100%;"> <strong><span
+                        id="puni-color"></span></strong> Puni</td>
+        </tr>
+        <tr>
+            <td><input type="number" id="const_" value="100" min="0" max="100" step="1"></td>
+            <td><input type="number" id="luster" value="100" min="0" max="100" step="1"></td>
+            <td><input type="number" id="mood" value="94" min="0" max="100" step="1"></td>
+        </tr>
+    </table>
 
-        <div>Show icons? <input type="checkbox" id="show_icons" name="show_icons" {{icons_state}}>
-            <span class="tooltip">(?)
-                <span class="tooltiptext"><strong>(WIP)</strong> Might make an already-slow program even
-                    slower...</span>
-            </span>
-        </div>
+    <div>Stats need to be ordered? <input type="checkbox" id="ordered">
+        <span class="tooltip">(?)
+            <span class="tooltiptext">Does the order of which stat has which number matter? Or is it ok that as long
+                as all three numbers appear in whichever stat?</span>
+        </span>
+    </div>
 
-        <button type="submit" id="submit">Submit</button>
-    </form>
-    <br>
+    <div>Show icons? <input type="checkbox" id="show_icons" checked>
+        <span class="tooltip">(?)
+            <span class="tooltiptext">Might make an already-slow program even slower...</span>
+        </span>
+    </div>
+
+    <button type="button" id="submit">Submit</button>
+
+    <br><br>
+    <button type="button" id="abort" class="hidden_btn"><span class="tooltip" style="border-bottom: none;">Abort!<span
+                class="tooltiptext" style="width: auto;">Barrel!</span></span></button>
+    <br><br>
+    <button type="button" id="clear" class="hidden_btn">Clear results</button>
     <div id="results-table">
         <table style="text-align: center;">
             <caption>Results</caption>

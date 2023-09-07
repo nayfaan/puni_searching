@@ -2,7 +2,8 @@
 __commit.py
 __`git commit.command
 __`Initiate venv.command
-services/__tk_init.py
+main.py
+puni.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
