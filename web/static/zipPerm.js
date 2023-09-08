@@ -45,7 +45,7 @@ onmessage = function (e) {
         for (item_combo of item_permutation) {
             // if (__abort) break;
             let total_score = sum_score(item_combo);
-
+            console.log(item_combo[0][0][0], item_combo[1][0][0], total_score);
             if (!ordered) total_score.sort(function (a, b) { return a - b });
 
             if (JSON.stringify(total_score) == JSON.stringify(puni_target)) postMessage([item_combo, total_score, show_icons])

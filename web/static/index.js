@@ -352,7 +352,7 @@ function puni_calc(settings) {
 
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
 
-    abort_button.removeClass("hidden_btn").addClass("shown_btn");
+    // abort_button.removeClass("hidden_btn").addClass("shown_btn");
 
     start_zip_worker();
     w.postMessage([puni_target, ordered, show_icons, item_category_rank_matrix]);
