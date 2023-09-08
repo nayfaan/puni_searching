@@ -45,57 +45,88 @@
         There are 2 categories both named "(Food)" in the game (food you collect in the wild vs food you create; why,
         Koei?). They are denoted as "(Food 1)" and "(Food 2)" respectively here.
         <br><br>
-        Attributes of items are what affects the stats of the puni <a href="https://barrelwisdom.com/ryza/puni-raising">(more information)</a>. Please ensure that your items has the exact same added attributes as below to get the correct result. E.g. "Spirit Bottle (Jewel)" would mean a Spirit Bottle with only (Jewel) added but not (Elixir), etc.
+        Attributes of items are what affects the stats of the puni <a
+            href="https://barrelwisdom.com/ryza/puni-raising">(more information)</a>. Please ensure that your items has
+        the exact same added attributes as below to get the correct result. E.g. "Spirit Bottle (Jewel)" would mean a
+        Spirit Bottle with only (Jewel) added but not (Elixir), etc.
         <hr>
-        For detailed information on what you can get (especially high quality rare items like dragon's eye) from different values of punis stats, translate <a href="https://wikiwiki.jp/ryza/%E6%94%BB%E7%95%A5%E3%83%A1%E3%83%A2/%E3%81%B7%E3%81%AB%E3%81%A8%E3%81%84%E3%81%A3%E3%81%97%E3%82%87">this Japanese site</a> with <a href="https://wikiwiki-jp.translate.goog/ryza/%E6%94%BB%E7%95%A5%E3%83%A1%E3%83%A2/%E3%81%B7%E3%81%AB%E3%81%A8%E3%81%84%E3%81%A3%E3%81%97%E3%82%87?_x_tr_sl=ja&_x_tr_tl=zh-TW&_x_tr_hl=en-US&_x_tr_pto=wapp">Google Translate</a> (or ChatGPT if you like).
+        For detailed information on what you can get (especially high quality rare items like dragon's eye) from
+        different values of punis stats, translate <a
+            href="https://wikiwiki.jp/ryza/%E6%94%BB%E7%95%A5%E3%83%A1%E3%83%A2/%E3%81%B7%E3%81%AB%E3%81%A8%E3%81%84%E3%81%A3%E3%81%97%E3%82%87">this
+            Japanese site</a> with <a
+            href="https://wikiwiki-jp.translate.goog/ryza/%E6%94%BB%E7%95%A5%E3%83%A1%E3%83%A2/%E3%81%B7%E3%81%AB%E3%81%A8%E3%81%84%E3%81%A3%E3%81%97%E3%82%87?_x_tr_sl=ja&_x_tr_tl=zh-TW&_x_tr_hl=en-US&_x_tr_pto=wapp">Google
+            Translate</a> (or ChatGPT if you like).
     </div>
     <hr>
 
-    <div>Duplicable only? <input type="checkbox" id="craftable_only" checked>
-        <span class="tooltip">(?)
-            <span class="tooltiptext">Only use items that can be duplicated with gems</span>
-        </span>
+    <div id="calc-frame">
+        <strong><u>Calculator</u></strong>
+        <br><br>
+        <div>Duplicable only? <input type="checkbox" id="craftable_only" checked>
+            <span class="tooltip">(?)
+                <span class="tooltiptext">Only use items that can be duplicated with gems</span>
+            </span>
+        </div>
+
+        <div>Max only? <input type="checkbox" id="best_only" checked>
+            <span class="tooltip">(?)
+                <span class="tooltiptext">Only use items that are rank (S) and has all possible attributes added</span>
+            </span>
+        </div>
+
+        <table id="puni-stats-table">
+            <tr>
+                <td><u>Const.</u></td>
+                <td><u>Luster</u></td>
+                <td><u>Mood</u></td>
+                <td rowspan="2"> = <img id="puni-img" src="" style="height: 100%;"> <strong><span
+                            id="puni-color"></span></strong> Puni</td>
+            </tr>
+            <tr>
+                <td><input type="number" id="const_" value="100" min="0" max="100" step="1"></td>
+                <td><input type="number" id="luster" value="100" min="0" max="100" step="1"></td>
+                <td><input type="number" id="mood" value="94" min="0" max="100" step="1"></td>
+            </tr>
+        </table>
+
+        <div>Stats need to be ordered? <input type="checkbox" id="ordered">
+            <span class="tooltip">(?)
+                <span class="tooltiptext">Does the order of which stat has which number matter? Or is it ok that as long
+                    as all three numbers appear in whichever stat?</span>
+            </span>
+        </div>
+
+        <div>Show icons? <input type="checkbox" id="show_icons" checked>
+            <span class="tooltip">(?)
+                <span class="tooltiptext">Might make an already-slow program even slower...</span>
+            </span>
+        </div>
+
+        <button type="button" id="submit"><span class="tooltip" style="border-bottom: none;">Submit!<span
+                    class="tooltiptext" style="width: auto;">Barrel!</span></span></button>
     </div>
-
-    <div>Max only? <input type="checkbox" id="best_only" checked>
-        <span class="tooltip">(?)
-            <span class="tooltiptext">Only use items that are rank (S) and has all possible attributes added</span>
-        </span>
-    </div>
-
-    <table id="puni-stats-table">
-        <tr>
-            <td><u>Const.</u></td>
-            <td><u>Luster</u></td>
-            <td><u>Mood</u></td>
-            <td rowspan="2"> = <img id="puni-img" src="" style="height: 100%;"> <strong><span
-                        id="puni-color"></span></strong> Puni</td>
-        </tr>
-        <tr>
-            <td><input type="number" id="const_" value="100" min="0" max="100" step="1"></td>
-            <td><input type="number" id="luster" value="100" min="0" max="100" step="1"></td>
-            <td><input type="number" id="mood" value="94" min="0" max="100" step="1"></td>
-        </tr>
-    </table>
-
-    <div>Stats need to be ordered? <input type="checkbox" id="ordered">
-        <span class="tooltip">(?)
-            <span class="tooltiptext">Does the order of which stat has which number matter? Or is it ok that as long
-                as all three numbers appear in whichever stat?</span>
-        </span>
-    </div>
-
-    <div>Show icons? <input type="checkbox" id="show_icons" checked>
-        <span class="tooltip">(?)
-            <span class="tooltiptext">Might make an already-slow program even slower...</span>
-        </span>
-    </div>
-
-    <button type="button" id="submit"><span class="tooltip" style="border-bottom: none;">Submit!<span
-                class="tooltiptext" style="width: auto;">Barrel!</span></span></button>
     <br><br>
 
     <table id="results-table" style="text-align: center;">
+        <tbody style="text-align: left;">
+            <tr>
+                <td>
+                    An "End of Results" line should appear at the bottom when all results are out. If you don't see it,
+                    the calculator is still trying to generate more results ( or I'm broken D: )
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Also, github page likes to timeout my app after it running a while so you're unlikely to see the end
+                    of the results list. ( Me poor me no money host my own server D: )
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Anyway, enjoy!
+                </td>
+            </tr>
+        </tbody>
         <!-- <caption>Results</caption>
         <thead>
             <tr>
@@ -109,12 +140,14 @@
         <tbody id="results">
         </tbody> -->
     </table>
-
+    <br><br>
     <div id="references">
         <b><u>References:</u></b>
         <ul>
             <li><a href="https://barrelwisdom.com/ryza/puni-raising">https://barrelwisdom.com/ryza/puni-raising</a></li>
-            <li><a href="https://docs.google.com/spreadsheets/d/197q5mN66pSpWmE2NklW4kToYs2cyD4lq8kPNrfkP72Y/edit?usp=sharing">https://docs.google.com/spreadsheets/d/197q5mN66pSpWmE2NklW4kToYs2cyD4lq8kPNrfkP72Y/edit?usp=sharing</a></li>
+            <li><a
+                    href="https://docs.google.com/spreadsheets/d/197q5mN66pSpWmE2NklW4kToYs2cyD4lq8kPNrfkP72Y/edit?usp=sharing">https://docs.google.com/spreadsheets/d/197q5mN66pSpWmE2NklW4kToYs2cyD4lq8kPNrfkP72Y/edit?usp=sharing</a>
+            </li>
         </ul>
     </div>
 

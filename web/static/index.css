@@ -1,3 +1,9 @@
+#calc-frame {
+    border: 0.25em solid black;
+    padding: 1em;
+    display: inline-block;
+}
+
 .vertical-center {
     margin: 0;
     position: absolute;
