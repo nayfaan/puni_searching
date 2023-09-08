@@ -1,16 +1,14 @@
-// function reduce_zip(z) {
-//     let s = new Set();
-//     for (i of z) {
-//         s.add(new Set(i));
-//     }
-//     return Array.from(s).map((set) => Array.from(set));
-// }
+var submit_button = $("#submit");
+var abort_button = $("#abort");
+var clear_button = $("#clear");
+
+var results_table = $("#results-table");
 
 function sum_score(feed_list) {
     let total = [20, 20, 20];
 
     for (let feed of feed_list) for (let i = 0; i < 3; i++) total[i] += feed[1] * feed[0][3][i];
-    
+
     for (let i = 0; i < 3; i++) total[i] = clamp(0, total[i], 100);
 
     return total
@@ -24,33 +22,138 @@ function clamp(min, num, max) {
             : num
 }
 
+function print_array(arr) {
+    let s = "[";
+    for (let a of arr) {
+        s += (a + ", ");
+    }
+    return s.slice(0, -2) + "]";
+}
+
+function print_header(show_icons) {
+    let thead_tr = $('<tr>')
+        .append(
+            $('<th>')
+                .attr('colspan', '2')
+        )
+
+    if (show_icons) {
+        thead_tr.append(
+            $('<th>')
+                .text("Img.")
+        )
+    }
+
+    thead_tr
+        .append(
+            $('<th>')
+                .text("Name")
+        )
+        .append(
+            $('<th>')
+                .text("Rank")
+        )
+        .append(
+            $('<th>')
+                .attr('colspan', '2')
+                .text("Add. Attr.")
+        );
+
+    results_table
+        .append(
+            $('<caption>')
+                .text("Results")
+        )
+        .append(
+            $('<thead>')
+                .append(
+                    thead_tr
+                )
+        ).append(
+            $('<tbody>')
+                .attr('id', 'results')
+        );
+}
+
 function print_result(item_combo, total_score, show_icons) {
-    //     s = "<tr><td colspan='100%' style='text-align: left; color: silver;'><b>Score: " + \
-    //     str(total_score) + "</b></td></tr>"
+    let tbody = results_table.find('tbody');
 
-    //     for item in sorted(item_combo, key = itemgetter(1), reverse = True):
-    //         item_name = item[0][0]
-    //     item_attr = item[0][1]
-    //     item_rank = item[0][2]
-    //     item_base_attr = [i for i in items[item_name][0: 4]if i is not None]
+    tbody.append(
+        $('<tr>')
+            .append(
+                $('<td>')
+                    .attr('colspan', '100%')
+                    .css({ 'text-align': 'left', 'color': 'silver' })
+                    .append(
+                        $('<b>')
+                            .text("Score: " + print_array(total_score))
+                    )
+            )
+    );
+    for (let item of item_combo.sort(function (a, b) { return b[1] - a[1]; })) {
+        let item_name = item[0][0];
+        let item_attr = item[0][1];
+        let item_rank = item[0][2];
 
-    //     item_add_attr = [i for i in item_attr if i not in item_base_attr]
+        let item_full_attr = Array.from(items[item_name]);
+        let item_base_attr = item_full_attr.splice(0, 4);
+        let item_add_attr = item_full_attr;
 
-    //     print_line = "<tr><td>" + str(item[1]) + "</td>" + "<td>*</td><td>"
+        let img;
+        if (show_icons) {
+            let img_src = "./web/static/images/items/" + item_name.toLowerCase().replace(/[\s']/g, "-") + ".webp"
+            img = $('<img>')
+                .addClass("item_thumb")
+                .attr('src', img_src)
+                .attr('onerror', "this.onerror=null; this.src='./web/static/images/404.webp'");
+        }
 
-    //     if show_icons:
-    //         print_line += '<img class="item_thumb" src="images/items/' + re.sub("$", ".webp", re.sub(
-    //             "[\s']", "-", item_name)) + '" onerror="this.onerror=null; this.src=\'images/404.webp\'">'
+        let tr = $('<tr>');
+        tr.append(
+            $('<td>')
+                .text(item[1])
+        )
+            .append(
+                $('<td>')
+                    .text(" * ")
+            );
 
-    //     print_line += "</td><td>" + item_name + \
-    //     "</td><td>(" + item_rank + ")</td>"
-    //     if item_add_attr:
-    //         print_line += ("<td>Add </td><td>" +
-    //             ' '.join(item_add_attr) + "</td>")
-    //     s += print_line + "</tr>"
+        if (show_icons) {
+            tr.append(
+                $('<td>')
+                    .append(img));
+        }
 
-    //     s += "<tr><td colspan='100%' style='border-top:2px solid black; height: 1.5em;'></td></tr>"
-    //     return Markup(s)
+        tr.append(
+            $('<td>')
+                .text(item_name)
+        ).append(
+            $('<td>')
+                .css("color", rank_color[item_rank])
+                .append(
+                    $('<b>')
+                        .text("(" + item_rank + ")")
+                )
+        );
+
+        if (item_add_attr.length) {
+            tr.append(
+                $('<td>')
+                    .text(item_add_attr.join(" "))
+            );
+        }
+
+        tbody.append(tr);
+    }
+    tbody
+    .append(
+        $('<tr>')
+            .append(
+                $('<td>')
+                    .attr('colspan', '100%')
+                    .css({ "border-top": "2px solid black", "height": "1.5em" })
+            )
+    )
 }
 
 function zip(arrays) {
@@ -86,12 +189,17 @@ function zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix) {
     }
 
     for (let p of permutation) {
-        // add abort functionality
+        // WIP: add abort functionality
         let item_permutation = [];
 
+        console.time('zip')
         for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
             item_permutation.push(zip([i, p]));
         }
+        console.timeEnd('zip')
+        console.log(p)
+        console.log(item_permutation.length)
+        console.log("")
 
         // if (new Set(p).size !== p.length) item_permutation = reduce_zip(item_permutation); //uneeded
 
@@ -100,7 +208,7 @@ function zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix) {
 
             if (!ordered) total_score.sort(function (a, b) { return a - b });
 
-            if (total_score==puni_target) print_result(item_combo, total_score, show_icons);
+            if (JSON.stringify(total_score) == JSON.stringify(puni_target)) print_result(item_combo, total_score, show_icons);
         }
     }
 }
@@ -153,9 +261,8 @@ function cross_item_category_rank(item_category_matrix, best_only) {
 
     let item_category_rank_matrix = [];
     for (let item_category of item_category_matrix) {
-        let name = item_category[0];
-
         let categories = item_category.splice(1);
+        let name = item_category[0];
 
         for (let rank_name in rank) {
             let rank_index = rank[rank_name];
@@ -179,7 +286,7 @@ function cross_item_category_rank(item_category_matrix, best_only) {
 }
 
 function puni_calc(settings) {
-    let [puni_target, [craftable_only, best_only, ordered]] = settings;
+    let [puni_target, [craftable_only, best_only, ordered, show_icons]] = settings;
 
     let item_category_matrix = cross_item_category(craftable_only, best_only);
 
@@ -189,12 +296,8 @@ function puni_calc(settings) {
 }
 
 function clear_results() {
-    $("#results").text("");
+    $("#results-table").text("");
 }
-
-var submit_button = $("#submit");
-var abort_button = $("#abort");
-var clear_button = $("#clear");
 
 submit_button.on("click", function () {
     clear_results();
@@ -202,9 +305,12 @@ submit_button.on("click", function () {
     // abort_button.removeClass("hidden_btn").addClass("shown_btn");
     // clear_button.removeClass("hidden_btn").addClass("shown_btn");
 
-    let const_val = parseInt($("#const_").val());
-    let luster_val = parseInt($("#luster").val());
-    let mood_val = parseInt($("#mood").val());
+    let const_val = parseInt(
+        $("#const_").val());
+    let luster_val = parseInt(
+        $("#luster").val());
+    let mood_val = parseInt(
+        $("#mood").val());
 
     let craftable_only = $("#craftable_only").is(":checked");
     let best_only = $("#best_only").is(":checked");
@@ -212,7 +318,9 @@ submit_button.on("click", function () {
     let show_icons = $("#show_icons").is(":checked");
 
     let puni_target = [const_val, luster_val, mood_val]
-    let settings = [puni_target, [craftable_only, best_only, ordered]]
+    let settings = [puni_target, [craftable_only, best_only, ordered, show_icons]]
+
+    print_header(show_icons);
 
     puni_calc(settings);
 });
@@ -222,5 +330,3 @@ abort_button.on("click", function () {
 
     abort_button.removeClass("shown_btn").addClass("hidden_btn");
 });
-
-

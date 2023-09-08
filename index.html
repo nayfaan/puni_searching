@@ -18,6 +18,7 @@
 </head>
 
 <body>
+    <div id="report-bug"><a href="https://github.com/nayfaan/puni_searching/issues/new" target="_blank">[Report Bug]</a></div>
     <div id="intro"><strong>Note:</strong> this application uses javascript (ES6) to generate results. Please ensure you
         haven't disabled it when using this application.
         <br>
@@ -28,7 +29,7 @@
         <br>
         If the application is still loading and you need to perform a new search, refresh the page.
         <br>
-        <del>( Welp. Where can I get the missing icons for this D: )</del>
+        <del>( Welp. Someone please tell me where I can get those missing icons D: )</del>
         <hr>
         This application generates a list of items you can feed the <strong>puni</strong> in <strong>Atelier Ryza
             1</strong> to achieve a specific stat.
@@ -42,7 +43,6 @@
     </div>
 
     <div>Max only? <input type="checkbox" id="best_only" checked>
-    <!-- <div>Max only? <input type="checkbox" id="best_only"> -->
         <span class="tooltip">(?)
             <span class="tooltiptext">Only use items that are rank (S) and has all possible attributes added</span>
         </span>
@@ -83,22 +83,20 @@
                 class="tooltiptext" style="width: auto;">Barrel!</span></span></button>
     <br><br>
     <button type="button" id="clear" class="hidden_btn">Clear results</button>
-    <div id="results-table">
-        <table style="text-align: center;">
-            <caption>Results</caption>
-            <thead>
-                <tr>
-                    <th colspan="2"></th>
-                    <th>Img.</th>
-                    <th>Name</th>
-                    <th>Rank</th>
-                    <th colspan="2">Add. Attr.</th>
-                </tr>
-            </thead>
-            <tbody id="results">
-            </tbody>
-        </table>
-    </div>
+    <table id="results-table" style="text-align: center;">
+        <!-- <caption>Results</caption>
+        <thead>
+            <tr>
+                <th colspan="2"></th>
+                <th>Img.</th>
+                <th>Name</th>
+                <th>Rank</th>
+                <th colspan="2">Add. Attr.</th>
+            </tr>
+        </thead>
+        <tbody id="results">
+        </tbody> -->
+    </table>
 
 </body>
 
