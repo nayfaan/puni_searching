@@ -6,23 +6,45 @@ var submit_button = $("#submit"),
 
     results_table = $("#results-table");
 
-function sum_score(feed_list) {
-    let total = [20, 20, 20];
-
-    for (let feed of feed_list) for (let i = 0; i < 3; i++) total[i] += feed[1] * feed[0][3][i];
-
-    for (let i = 0; i < 3; i++) total[i] = clamp(0, total[i], 100);
-
-    return total
+function start_zip_worker() {
+    if (typeof (Worker) !== "undefined") {
+        if (typeof (w) == "undefined") {
+            w = new Worker("./web/static/zipPerm.js");
+        }
+        w.onmessage = function (event) {
+            if (event.data !== true) {
+                let [item_combo, total_score, show_icons] = event.data
+                print_result(item_combo, total_score, show_icons);
+            }
+            else conclude_calc();
+        };
+    } else {
+        results_table.text("ERROR: Web Worker support required. Please use a more updated browser.");
+    }
 }
 
-function clamp(min, num, max) {
-    return num <= min
-        ? min
-        : num >= max
-            ? max
-            : num
+function stop_zip_worker() {
+    w.terminate();
+    w = undefined;
 }
+
+// function sum_score(feed_list) {
+//     let total = [20, 20, 20];
+
+//     for (let feed of feed_list) for (let i = 0; i < 3; i++) total[i] += feed[1] * feed[0][3][i];
+
+//     for (let i = 0; i < 3; i++) total[i] = clamp(0, total[i], 100);
+
+//     return total
+// }
+
+// function clamp(min, num, max) {
+//     return num <= min
+//         ? min
+//         : num >= max
+//             ? max
+//             : num
+// }
 
 function print_array(arr) {
     let s = "[";
@@ -77,7 +99,7 @@ function print_header(show_icons) {
         );
 }
 
-function print_result(item_combo, total_score, show_icons) {
+async function print_result(item_combo, total_score, show_icons) {
     let tbody = results_table.find('tbody');
 
     tbody.append(
@@ -92,10 +114,8 @@ function print_result(item_combo, total_score, show_icons) {
                     )
             )
     );
-    for (let item of item_combo.sort(function (a, b) { return b[1] - a[1]; })) {
-        let item_name = item[0][0];
-        let item_attr = item[0][1];
-        let item_rank = item[0][2];
+    for (let [item_data, item_count] of item_combo.sort(function (a, b) { return b[1] - a[1]; })) {
+        let [item_name, item_attr, item_rank] = item_data;
 
         let item_full_attr = Array.from(items[item_name]);
         let item_base_attr = item_full_attr.splice(0, 4);
@@ -113,7 +133,7 @@ function print_result(item_combo, total_score, show_icons) {
         let tr = $('<tr>');
         tr.append(
             $('<td>')
-                .text(item[1])
+                .text(item_count)
         )
             .append(
                 $('<td>')
@@ -147,6 +167,7 @@ function print_result(item_combo, total_score, show_icons) {
 
         tbody.append(tr);
     }
+
     tbody
         .append(
             $('<tr>')
@@ -158,64 +179,64 @@ function print_result(item_combo, total_score, show_icons) {
         )
 }
 
-function zip(arrays) {
-    return arrays[0].map(function (_, i) {
-        return arrays.map(function (array) { return array[i] })
-    });
-}
+// function itertoolsCombinations(arr, size) {
+//     const result = [];
 
-function itertoolsCombinations(arr, size) {
-    const result = [];
+//     function c(current, start) {
+//         if (current.length === size) {
+//             result.push([...current]);
+//             return;
+//         }
 
-    function c(current, start) {
-        if (current.length === size) {
-            result.push([...current]);
-            return;
-        }
+//         for (let i = start; i < arr.length; i++) {
+//             current.push(arr[i]);
+//             c(current, i + 1);
+//             current.pop();
+//         }
+//     }
 
-        for (let i = start; i < arr.length; i++) {
-            current.push(arr[i]);
-            c(current, i + 1);
-            current.pop();
-        }
-    }
+//     c([], 0);
 
-    c([], 0);
+//     return result;
+// }
 
-    return result;
-}
+// function zip(arrays) {
+//     return arrays[0].map(function (_, i) {
+//         return arrays.map(function (array) { return array[i] })
+//     });
+// }
 
-function zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix) {
-    if (!ordered) {
-        puni_target.sort(function (a, b) { return a - b })
-    }
+// function zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix) {
+//     if (!ordered) {
+//         puni_target.sort(function (a, b) { return a - b })
+//     }
 
-    for (let p of permutation) {
-        if (__abort) break;
-        let item_permutation = [];
+//     for (let p of permutation) {
+//         if (__abort) break;
+//         let item_permutation = [];
 
-        console.time('zip')
-        for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
-            if (__abort) break;
-            item_permutation.push(zip([i, p]));
-        }
-        console.timeEnd('zip')
-        console.log(p)
-        console.log(item_permutation.length)
-        console.log("")
+//         console.time('zip')
+//         for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
+//             if (__abort) break;
+//             item_permutation.push(zip([i, p]));
+//         }
+//         console.timeEnd('zip')
+//         console.log(p)
+//         console.log(item_permutation.length)
+//         console.log("")
 
-        // if (new Set(p).size !== p.length) item_permutation = reduce_zip(item_permutation); //uneeded
+//         // if (new Set(p).size !== p.length) item_permutation = reduce_zip(item_permutation); //uneeded
 
-        for (item_combo of item_permutation) {
-            if (__abort) break;
-            let total_score = sum_score(item_combo);
+//         for (item_combo of item_permutation) {
+//             if (__abort) break;
+//             let total_score = sum_score(item_combo);
 
-            if (!ordered) total_score.sort(function (a, b) { return a - b });
+//             if (!ordered) total_score.sort(function (a, b) { return a - b });
 
-            if (JSON.stringify(total_score) == JSON.stringify(puni_target)) print_result(item_combo, total_score, show_icons);
-        }
-    }
-}
+//             if (JSON.stringify(total_score) == JSON.stringify(puni_target)) print_result(item_combo, total_score, show_icons);
+//         }
+//     }
+// }
 
 function cross_item_category(craftable_only, best_only) {
     let item_category_matrix = [[]];
@@ -289,15 +310,52 @@ function cross_item_category_rank(item_category_matrix, best_only) {
     return item_category_rank_matrix;
 }
 
+function conclude_calc() {
+    stop_zip_worker();
+    let tbody = results_table.find('tbody');
+    tbody
+        .append(
+            $('<tr>')
+                .append(
+                    $('<td>')
+                        .attr('colspan', '100%')
+                        .css({ "height": "1.5em" })
+                )
+        )
+        .append(
+            $('<tr>')
+                .append(
+                    $('<td>')
+                        .attr('colspan', '100%')
+                        .append(
+                            $('<strong>')
+                                .append(
+                                    $('<span>')
+                                        .addClass("tooltip")
+                                        .text("[END OF RESULTS]")
+                                        .append(
+                                            $('<span>')
+                                                .addClass("tooltiptext")
+                                                .text("If the table is empty (unlikely), there are no valid results.")
+                                        )
+                                )
+                        )
+                )
+        )
+    abort_button.removeClass("shown_btn").addClass("hidden_btn");
+}
+
 function puni_calc(settings) {
     let [puni_target, [craftable_only, best_only, ordered, show_icons]] = settings;
 
     let item_category_matrix = cross_item_category(craftable_only, best_only);
 
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
-    console.log(abort_button)
+
     abort_button.removeClass("hidden_btn").addClass("shown_btn");
-    console.log(abort_button)
+
+    start_zip_worker();
+    w.postMessage([puni_target, ordered, show_icons, item_category_rank_matrix]);
     // zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix);
 }
 
