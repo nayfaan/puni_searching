@@ -34,22 +34,20 @@ onmessage = function (e) {
     }
 
     for (let p of permutation) {
-        // if (__abort) break;
         let item_permutation = [];
 
         for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
-            // if (__abort) break;
             item_permutation.push(zip([i, p]));
         }
 
         for (item_combo of item_permutation) {
-            // if (__abort) break;
-            let total_score = sum_score(item_combo);
-            console.log(item_combo[0][0][0], item_combo[1][0][0], total_score);
+            let total_score = sum_score(item_combo),
+                total_score_unsorted = Array.from(total_score);
+
             if (!ordered) total_score.sort(function (a, b) { return a - b });
 
-            if (JSON.stringify(total_score) == JSON.stringify(puni_target)) postMessage([item_combo, total_score, show_icons])
+            if (JSON.stringify(total_score) == JSON.stringify(puni_target)) postMessage([item_combo, total_score_unsorted, show_icons]);
         }
     }
-    postMessage(true)
+    postMessage(true);
 };

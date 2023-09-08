@@ -1,9 +1,4 @@
 var submit_button = $("#submit"),
-    abort_button = $("#abort"),
-    // clear_button = $("#clear"),
-
-    __abort = false,
-
     results_table = $("#results-table");
 
 function start_zip_worker() {
@@ -13,8 +8,8 @@ function start_zip_worker() {
         }
         w.onmessage = function (event) {
             if (event.data !== true) {
-                let [item_combo, total_score, show_icons] = event.data
-                print_result(item_combo, total_score, show_icons);
+                let [item_combo, total_score_unsorted, show_icons] = event.data
+                print_result(item_combo, total_score_unsorted, show_icons);
             }
             else conclude_calc();
         };
@@ -27,24 +22,6 @@ function stop_zip_worker() {
     w.terminate();
     w = undefined;
 }
-
-// function sum_score(feed_list) {
-//     let total = [20, 20, 20];
-
-//     for (let feed of feed_list) for (let i = 0; i < 3; i++) total[i] += feed[1] * feed[0][3][i];
-
-//     for (let i = 0; i < 3; i++) total[i] = clamp(0, total[i], 100);
-
-//     return total
-// }
-
-// function clamp(min, num, max) {
-//     return num <= min
-//         ? min
-//         : num >= max
-//             ? max
-//             : num
-// }
 
 function print_array(arr) {
     let s = "[";
@@ -99,7 +76,7 @@ function print_header(show_icons) {
         );
 }
 
-async function print_result(item_combo, total_score, show_icons) {
+function print_result(item_combo, total_score, show_icons) {
     let tbody = results_table.find('tbody');
 
     tbody.append(
@@ -117,9 +94,11 @@ async function print_result(item_combo, total_score, show_icons) {
     for (let [item_data, item_count] of item_combo.sort(function (a, b) { return b[1] - a[1]; })) {
         let [item_name, item_attr, item_rank] = item_data;
 
-        let item_full_attr = Array.from(items[item_name]);
-        let item_base_attr = item_full_attr.splice(0, 4);
-        let item_add_attr = item_full_attr;
+        let item_orig_full_attr = Array.from(items[item_name]);
+        let item_orig_base_attr = item_orig_full_attr.splice(0, 4).filter(e => e);
+
+        let item_add_attr = item_attr.filter(i => !item_orig_base_attr.includes(i))
+
 
         let img;
         if (show_icons) {
@@ -178,65 +157,6 @@ async function print_result(item_combo, total_score, show_icons) {
                 )
         )
 }
-
-// function itertoolsCombinations(arr, size) {
-//     const result = [];
-
-//     function c(current, start) {
-//         if (current.length === size) {
-//             result.push([...current]);
-//             return;
-//         }
-
-//         for (let i = start; i < arr.length; i++) {
-//             current.push(arr[i]);
-//             c(current, i + 1);
-//             current.pop();
-//         }
-//     }
-
-//     c([], 0);
-
-//     return result;
-// }
-
-// function zip(arrays) {
-//     return arrays[0].map(function (_, i) {
-//         return arrays.map(function (array) { return array[i] })
-//     });
-// }
-
-// function zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix) {
-//     if (!ordered) {
-//         puni_target.sort(function (a, b) { return a - b })
-//     }
-
-//     for (let p of permutation) {
-//         if (__abort) break;
-//         let item_permutation = [];
-
-//         console.time('zip')
-//         for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
-//             if (__abort) break;
-//             item_permutation.push(zip([i, p]));
-//         }
-//         console.timeEnd('zip')
-//         console.log(p)
-//         console.log(item_permutation.length)
-//         console.log("")
-
-//         // if (new Set(p).size !== p.length) item_permutation = reduce_zip(item_permutation); //uneeded
-
-//         for (item_combo of item_permutation) {
-//             if (__abort) break;
-//             let total_score = sum_score(item_combo);
-
-//             if (!ordered) total_score.sort(function (a, b) { return a - b });
-
-//             if (JSON.stringify(total_score) == JSON.stringify(puni_target)) print_result(item_combo, total_score, show_icons);
-//         }
-//     }
-// }
 
 function cross_item_category(craftable_only, best_only) {
     let item_category_matrix = [[]];
@@ -342,7 +262,8 @@ function conclude_calc() {
                         )
                 )
         )
-    abort_button.removeClass("shown_btn").addClass("hidden_btn");
+
+    submit_button.prop("disabled", false);
 }
 
 function puni_calc(settings) {
@@ -352,11 +273,8 @@ function puni_calc(settings) {
 
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
 
-    // abort_button.removeClass("hidden_btn").addClass("shown_btn");
-
     start_zip_worker();
     w.postMessage([puni_target, ordered, show_icons, item_category_rank_matrix]);
-    // zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix);
 }
 
 function clear_results() {
@@ -364,9 +282,8 @@ function clear_results() {
 }
 
 submit_button.on("click", function () {
+    submit_button.prop("disabled", true);
     clear_results();
-
-    // clear_button.removeClass("hidden_btn").addClass("shown_btn");
 
     let const_val = parseInt(
         $("#const_").val());
@@ -384,14 +301,5 @@ submit_button.on("click", function () {
     let settings = [puni_target, [craftable_only, best_only, ordered, show_icons]]
 
     print_header(show_icons);
-
     puni_calc(settings);
-
-    __abort = false;
-});
-
-abort_button.on("click", function () {
-    __abort = true;
-
-    abort_button.removeClass("shown_btn").addClass("hidden_btn");
 });

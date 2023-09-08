@@ -19,21 +19,35 @@
 </head>
 
 <body>
-    <div id="report-bug"><a href="https://github.com/nayfaan/puni_searching/issues/new" target="_blank">[Report Bug]</a></div>
+    <div id="report-bug"><a href="https://github.com/nayfaan/puni_searching/issues/new" target="_blank">[Report Bug]</a>
+    </div>
+    <hr>
     <div id="intro"><strong>Note:</strong> this application uses javascript (ES6) to generate results. Please ensure you
         haven't disabled it when using this application.
         <br>
-        <strong>Note:</strong> this application takes a long time to run to completion, but it should be
-        able to give you partial results quickly (assuming that the combo you asked for exists).
+        <strong>Note:</strong> highly recommend running on Google Chrome. Safari works, but is much slower (Other
+        browsers not tested).
         <br>
-        It is highly recommended that you turn on "Duplicable only" and "Max only" to reduce the loadtime.
+        <strong>Note:</strong> this application takes a long time to run to completion, but it should be
+        able to give you partial results quickly.
+        <br>
+        It is highly recommended that you turn on "Duplicable only" and "Max only" to reduce the loadtime (by A LOT).
         <br>
         If the application is still loading and you need to perform a new search, refresh the page.
         <br>
         <del>( Welp. Someone please tell me where I can get those missing icons D: )</del>
+        <br>
+        <del>( not responsible if I crash your browser :P. Be warned )</del>
         <hr>
         This application generates a list of items you can feed the <strong>puni</strong> in <strong>Atelier Ryza
             1</strong> to achieve a specific stat.
+        <br><br>
+        There are 2 categories both named "(Food)" in the game (food you collect in the wild vs food you create; why,
+        Koei?). They are denoted as "(Food 1)" and "(Food 2)" respectively here.
+        <br><br>
+        Attributes of items are what affects the stats of the puni <a href="https://barrelwisdom.com/ryza/puni-raising">(more information)</a>. Please ensure that your items has the exact same added attributes as below to get the correct result. E.g. "Spirit Bottle (Jewel)" would mean a Spirit Bottle with only (Jewel) added but not (Elixir), etc.
+        <hr>
+        For detailed information on what you can get (especially high quality rare items like dragon's eye) from different values of punis stats, translate <a href="https://wikiwiki.jp/ryza/%E6%94%BB%E7%95%A5%E3%83%A1%E3%83%A2/%E3%81%B7%E3%81%AB%E3%81%A8%E3%81%84%E3%81%A3%E3%81%97%E3%82%87">this Japanese site</a> with <a href="https://wikiwiki-jp.translate.goog/ryza/%E6%94%BB%E7%95%A5%E3%83%A1%E3%83%A2/%E3%81%B7%E3%81%AB%E3%81%A8%E3%81%84%E3%81%A3%E3%81%97%E3%82%87?_x_tr_sl=ja&_x_tr_tl=zh-TW&_x_tr_hl=en-US&_x_tr_pto=wapp">Google Translate</a> (or ChatGPT if you like).
     </div>
     <hr>
 
@@ -60,7 +74,7 @@
         <tr>
             <td><input type="number" id="const_" value="100" min="0" max="100" step="1"></td>
             <td><input type="number" id="luster" value="100" min="0" max="100" step="1"></td>
-            <td><input type="number" id="mood" value="0" min="0" max="100" step="1"></td>
+            <td><input type="number" id="mood" value="94" min="0" max="100" step="1"></td>
         </tr>
     </table>
 
@@ -77,13 +91,10 @@
         </span>
     </div>
 
-    <button type="button" id="submit">Submit</button>
-
-    <br><br>
-    <button type="button" id="abort" class="hidden_btn"><span class="tooltip" style="border-bottom: none;">Abort!<span
+    <button type="button" id="submit"><span class="tooltip" style="border-bottom: none;">Submit!<span
                 class="tooltiptext" style="width: auto;">Barrel!</span></span></button>
     <br><br>
-    <button type="button" id="clear" class="hidden_btn">Clear results</button>
+
     <table id="results-table" style="text-align: center;">
         <!-- <caption>Results</caption>
         <thead>
@@ -98,6 +109,14 @@
         <tbody id="results">
         </tbody> -->
     </table>
+
+    <div id="references">
+        <b><u>References:</u></b>
+        <ul>
+            <li><a href="https://barrelwisdom.com/ryza/puni-raising">https://barrelwisdom.com/ryza/puni-raising</a></li>
+            <li><a href="https://docs.google.com/spreadsheets/d/197q5mN66pSpWmE2NklW4kToYs2cyD4lq8kPNrfkP72Y/edit?usp=sharing">https://docs.google.com/spreadsheets/d/197q5mN66pSpWmE2NklW4kToYs2cyD4lq8kPNrfkP72Y/edit?usp=sharing</a></li>
+        </ul>
+    </div>
 
 </body>
 
