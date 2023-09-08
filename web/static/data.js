@@ -362,17 +362,9 @@ const items = {
     "Red Stone": ["(Elixir)", "(Mystery)", null, null, "(Medicinal)", "(Puniball)"]
 }
 
-// const items = {
-//     "Prosthetic Arm": ["(Metal)", null, null, null, "(Mystery)", null],
-//     "Super Steel Gear": ["(Metal)", null, null, null, "(General Goods)", null],
-//     "Red Stone": ["(Elixir)", "(Mystery)", null, null, "(Medicinal)", "(Puniball)"],
-//     "Yellow Supplement": ["(Supplement)", null, null, null, "(Ore)", "(Thread)"]
-// }
-
 const craftables = ['Explosive Uni', 'Ice Caltrop', 'Craft', 'Bomb', 'Ice Bomb', 'Plajig', 'Luft', 'Norden Brand', 'Lightning Bell', 'Bubble Bullet', 'Rose Bomb', 'Kleid Ice Bomb', 'Strahl Plajig', 'Ratsel Luft', 'Fire Bottle', 'Genesis Hammer', 'Vanish Siegel', 'Lunar Lamp', 'Eternal Fear', "Philosopher's Book", 'Grass Beans', 'Dry Biscuit', 'Blessing Ointment', 'Puni Jelly', 'Rasen Pudding', 'Trickling Breeze', 'Restoration Bottle', 'Nectar', 'Healing Ball', 'Dynamic Syrup', 'Cocktail Leb', 'Goddess Cup', 'Elixir', 'Fish Oil', 'War Powder', 'Thorny Embrace', 'Energianica', 'Sundry Remedy', 'Poison Smoke', 'Mystic Robe', 'Miracle Ebonyal', 'Heroic Geist', 'Astronomical Clock', 'Red Supplement', 'Blue Supplement', 'Yellow Supplement', 'Green Supplement', 'Polish Powder', 'Zettel', 'Delicious Bait', 'Alchemy Paint', 'Delphi Rose Incense', 'Ingot', 'Bronze Eisen', 'Staltium', 'Criminea', 'Goldoterion', 'Cloth', 'Natural Cloth', 'Beastial Air', 'Sorcery Rose', 'Eldrocode', 'Pearl Crystal', 'Amberlite', 'Spirinite', "Saint's Diamond", 'Arc en Ciel', 'Honey', 'Eltz Sugar', "Traveler's Water Orb", 'Super Pure Water', 'Healing Chip', 'Holy Drop', 'Poison Cube', 'Taboo Drop', 'Lightning Sand', 'Marblestone', 'Gunpowder Base', 'Blue Flame Ember', 'Mixing Oil', 'Meltstone', 'Flour', 'Gelatin Powder', 'Alchemy Fibers', "Heaven's String", 'Composite Plate', 'Holy Nut', 'Mist Liquid', 'Feather Draft', 'Puni Leather', 'Master Leather', 'Glass Flower', 'Spirit Bottle', 'Crystal Element', "Philosopher's Stone", 'Plant Seed', 'Stone Seed', 'Fire Seed', 'Water Seed', 'Mystic Seed', 'Fairystone Block', 'Building Material', 'Stone Material', 'Seaweed Soil', 'Soft Rubber Stone', 'Monster Attractor', 'Powerful Fish Bait', 'Prosthetic Arm', 'Super Steel Gear', 'Red Stone']
 
 const permutation = [[6], [5, 1], [4, 2], [3, 3], [2, 4], [1, 5], [4, 1, 1], [3, 2, 1], [3, 1, 2], [2, 3, 1], [2, 2, 2], [2, 1, 3], [1, 4, 1], [1, 3, 2], [1, 2, 3], [1, 1, 4], [3, 1, 1, 1], [2, 2, 1, 1], [2, 1, 2, 1], [2, 1, 1, 2], [1, 3, 1, 1], [1, 2, 2, 1], [1, 2, 1, 2], [1, 1, 3, 1], [1, 1, 2, 2], [1, 1, 1, 3], [2, 1, 1, 1, 1], [1, 2, 1, 1, 1], [1, 1, 2, 1, 1], [1, 1, 1, 2, 1], [1, 1, 1, 1, 2], [1, 1, 1, 1, 1, 1]]
-// const permutation = [[4, 1, 1], [1, 4, 1], [1, 1, 4]]
 
 const rank_color = {
     S: "#e6bf5a",

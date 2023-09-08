@@ -1,8 +1,10 @@
-var submit_button = $("#submit");
-var abort_button = $("#abort");
-var clear_button = $("#clear");
+var submit_button = $("#submit"),
+    abort_button = $("#abort"),
+    // clear_button = $("#clear"),
 
-var results_table = $("#results-table");
+    __abort = false,
+
+    results_table = $("#results-table");
 
 function sum_score(feed_list) {
     let total = [20, 20, 20];
@@ -146,14 +148,14 @@ function print_result(item_combo, total_score, show_icons) {
         tbody.append(tr);
     }
     tbody
-    .append(
-        $('<tr>')
-            .append(
-                $('<td>')
-                    .attr('colspan', '100%')
-                    .css({ "border-top": "2px solid black", "height": "1.5em" })
-            )
-    )
+        .append(
+            $('<tr>')
+                .append(
+                    $('<td>')
+                        .attr('colspan', '100%')
+                        .css({ "border-top": "2px solid black", "height": "1.5em" })
+                )
+        )
 }
 
 function zip(arrays) {
@@ -189,11 +191,12 @@ function zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix) {
     }
 
     for (let p of permutation) {
-        // WIP: add abort functionality
+        if (__abort) break;
         let item_permutation = [];
 
         console.time('zip')
         for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
+            if (__abort) break;
             item_permutation.push(zip([i, p]));
         }
         console.timeEnd('zip')
@@ -204,6 +207,7 @@ function zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix) {
         // if (new Set(p).size !== p.length) item_permutation = reduce_zip(item_permutation); //uneeded
 
         for (item_combo of item_permutation) {
+            if (__abort) break;
             let total_score = sum_score(item_combo);
 
             if (!ordered) total_score.sort(function (a, b) { return a - b });
@@ -291,8 +295,10 @@ function puni_calc(settings) {
     let item_category_matrix = cross_item_category(craftable_only, best_only);
 
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
-
-    zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix);
+    console.log(abort_button)
+    abort_button.removeClass("hidden_btn").addClass("shown_btn");
+    console.log(abort_button)
+    // zipPerm(puni_target, ordered, show_icons, item_category_rank_matrix);
 }
 
 function clear_results() {
@@ -302,7 +308,6 @@ function clear_results() {
 submit_button.on("click", function () {
     clear_results();
 
-    // abort_button.removeClass("hidden_btn").addClass("shown_btn");
     // clear_button.removeClass("hidden_btn").addClass("shown_btn");
 
     let const_val = parseInt(
@@ -323,10 +328,12 @@ submit_button.on("click", function () {
     print_header(show_icons);
 
     puni_calc(settings);
+
+    __abort = false;
 });
 
 abort_button.on("click", function () {
-
+    __abort = true;
 
     abort_button.removeClass("shown_btn").addClass("hidden_btn");
 });
