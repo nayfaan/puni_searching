@@ -27,18 +27,6 @@ function last_color(fit_color) {
     return puni_colors;
 }
 
-function limit_stat(input) {
-    var regex = /^[0-9]*$/;
-    // console.log(input.val(), regex.test(input.val()))
-    if (!input.val().match(regex)) {
-        input.val(100);
-    }
-
-    if ((input.val() < 0) || (input.val() > 20)) {
-        return false;
-    }
-}
-
 function update_puni_colors() {
     let const_val = parseInt($("#const_").val());
     let luster_val = parseInt($("#luster").val());
@@ -71,10 +59,6 @@ const puni_colors = {
 };
 
 const puni_order = ["Shining", "Abyss", "Big", "Flare", "Moon", "Gold", "Silver", "Stone", "Black", "Red", "Green", "Blue"];
-
-function validate_stats(e) {
-
-}
 
 // Restricts input for the set of matched elements to the given inputFilter function.
 (function ($) {
