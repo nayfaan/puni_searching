@@ -4,6 +4,14 @@
     display: inline-block;
 }
 
+#puni-stats-table {
+    style="text-align: center;"
+}
+
+#puni-stats-table input {
+    width: 2.5em;
+}
+
 .vertical-center {
     margin: 0;
     position: absolute;

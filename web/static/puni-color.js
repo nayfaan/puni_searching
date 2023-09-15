@@ -27,6 +27,18 @@ function last_color(fit_color) {
     return puni_colors;
 }
 
+function limit_stat(input) {
+    var regex = /^[0-9]*$/;
+    // console.log(input.val(), regex.test(input.val()))
+    if (!input.val().match(regex)) {
+        input.val(100);
+    }
+
+    if ((input.val() < 0) || (input.val() > 20)) {
+        return false;
+    }
+}
+
 function update_puni_colors() {
     let const_val = parseInt($("#const_").val());
     let luster_val = parseInt($("#luster").val());
@@ -60,10 +72,56 @@ const puni_colors = {
 
 const puni_order = ["Shining", "Abyss", "Big", "Flare", "Moon", "Gold", "Silver", "Stone", "Black", "Red", "Green", "Blue"];
 
+function validate_stats(e) {
+
+}
+
+// Restricts input for the set of matched elements to the given inputFilter function.
+(function ($) {
+    $.fn.inputFilter = function (callback) {
+        return this.on("input keydown keyup mousedown mouseup select contextmenu drop focusout", function (e) {
+            if (callback(this.value)) {
+                // Accepted value
+                this.oldValue = this.value;
+                this.oldSelectionStart = this.selectionStart;
+                this.oldSelectionEnd = this.selectionEnd;
+            } else if (this.hasOwnProperty("oldValue")) {
+                // Rejected value - restore the previous one
+                this.reportValidity();
+                this.value = this.oldValue;
+                this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+            } else {
+                // Rejected value - nothing to restore
+                this.value = "";
+            }
+
+            if (e.type == "keydown" && e.which === 38) this.value = parseInt(this.value) + 1;
+            if (e.type == "keydown" && e.which === 40) this.value = parseInt(this.value) - 1;
+
+            if (this.value == "") this.value = 0;
+            else {
+                let stat_val = parseInt(this.value);
+                if (stat_val > 100) this.value = 100;
+                if (stat_val < 0) this.value = 0;
+            }
+
+            this.value = parseInt(this.value);
+
+            update_puni_colors();
+        });
+    };
+}(jQuery));
+
 $(document).ready(function () {
     update_puni_colors();
+
+    $("#puni-stats-table input").inputFilter(function (value) {
+        return /^\d*$/.test(value);    // Allowing digits only
+    });
 });
 
-$("#puni-stats-table input").on('input', function () {
-    update_puni_colors();
+$("#puni-stats-table input").on('keydown', function (e) {
+    if (e.which === 38 || e.which === 40) {
+        e.preventDefault();
+    }
 });
