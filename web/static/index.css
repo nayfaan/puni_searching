@@ -12,6 +12,10 @@
     width: 2.5em;
 }
 
+.stat_range {
+    display: none;
+}
+
 .vertical-center {
     margin: 0;
     position: absolute;

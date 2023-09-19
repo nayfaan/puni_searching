@@ -26,12 +26,23 @@ function sum_score(feed_list) {
     return total
 }
 
+function is_between(puni_target, puni_target_min, total_score){
+    let between = true;
+    for(let i = 0; i < 3; i++){
+        if (!between) continue;
+        if (!(total_score[i] <= puni_target[i] && puni_target_min[i] <= total_score[i])) between = false;
+    }
+    return between;
+}
+
 onmessage = function (e) {
-    [puni_target, ordered, show_icons, item_category_rank_matrix] = e.data
+    [puni_target, ordered, show_icons, item_category_rank_matrix, is_range, puni_target_min] = e.data
 
     if (!ordered) {
         puni_target.sort(function (a, b) { return a - b })
     }
+
+    let success_match = false;
 
     for (let p of permutation) {
         let item_permutation = [];
@@ -41,12 +52,19 @@ onmessage = function (e) {
         }
 
         for (item_combo of item_permutation) {
+            success_match = false;
+
             let total_score = sum_score(item_combo),
                 total_score_unsorted = Array.from(total_score);
 
-            if (!ordered) total_score.sort(function (a, b) { return a - b });
+            if (!is_range){
+                if (!ordered) total_score.sort(function (a, b) { return a - b });
+                if (JSON.stringify(total_score) == JSON.stringify(puni_target)) success_match = true;
+            }else{
+                if (is_between(puni_target, puni_target_min, total_score)) success_match = true;
+            }
 
-            if (JSON.stringify(total_score) == JSON.stringify(puni_target)) postMessage([item_combo, total_score_unsorted, show_icons]);
+            if (success_match) postMessage([item_combo, total_score_unsorted, show_icons]);
         }
     }
     postMessage(true);

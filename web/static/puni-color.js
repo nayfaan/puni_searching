@@ -32,14 +32,27 @@ function update_puni_colors() {
     let luster_val = parseInt($("#luster").val());
     let mood_val = parseInt($("#mood").val());
 
+    let const_val_min = parseInt($("#const_min").val());
+    let luster_val_min = parseInt($("#luster_min").val());
+    let mood_val_min = parseInt($("#mood_min").val());
+
     let puni_stats = [const_val, luster_val, mood_val];
+    let puni_stats_min = [const_val_min, luster_val_min, mood_val_min];
 
     let fit_color = check_color_range(puni_stats);
     let color = last_color(fit_color);
 
+    let fit_color_min = check_color_range(puni_stats_min);
+    let color_min = last_color(fit_color_min);
+
     if ($("#puni-color").html() != color) {
         $("#puni-color").html(color);
         $("#puni-img").attr("src", "web/static/images/punis/" + color.toLowerCase() + ".webp");
+    }
+
+    if ($("#puni-color-min").html() != color_min) {
+        $("#puni-color-min").html(color_min);
+        $("#puni-img-min").attr("src", "web/static/images/punis/" + color_min.toLowerCase() + ".webp");
     }
 }
 
@@ -64,7 +77,16 @@ const puni_order = ["Shining", "Abyss", "Big", "Flare", "Moon", "Gold", "Silver"
 (function ($) {
     $.fn.inputFilter = function (callback) {
         return this.on("input keydown keyup mousedown mouseup select contextmenu drop focusout", function (e) {
-            if (callback(this.value)) {
+            let callback_value = callback(this.value);
+
+            // Capping min/max values
+            let check_min = true;
+            if (parseInt($("#const_").val()) < parseInt($("#const_min").val()) || parseInt($("#luster").val()) < parseInt($("#luster_min").val()) || parseInt($("#mood").val()) < parseInt($("#mood_min").val())) {
+                check_min = false;
+            }
+
+            // Processing value 
+            if (callback_value && check_min) {
                 // Accepted value
                 this.oldValue = this.value;
                 this.oldSelectionStart = this.selectionStart;
@@ -100,7 +122,8 @@ $(document).ready(function () {
     update_puni_colors();
 
     $("#puni-stats-table input").inputFilter(function (value) {
-        return /^\d*$/.test(value);    // Allowing digits only
+        let regex_test = /^\d*$/.test(value);
+        return regex_test;    // Allowing digits only
     });
 });
 

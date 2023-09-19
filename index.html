@@ -53,8 +53,7 @@
         Spirit Bottle with only (Jewel) added but not (Elixir), etc.
         <hr>
         For detailed information on what you can get (especially high quality rare items like dragon's eye) from
-        different values of punis stats, translate <a
-            href="https://wikiwiki.jp/ryza/%E6%94%BB%E7%95%A5%E3%83%A1%E3%83%A2/%E3%81%B7%E3%81%AB%E3%81%A8%E3%81%84%E3%81%A3%E3%81%97%E3%82%87">this
+        different values of punis stats, translate <a href="https://wikiwiki.jp/ryza/攻略メモ/ぷにといっしょ">this
             Japanese site</a> with <a
             href="https://wikiwiki-jp.translate.goog/ryza/攻略メモ/ぷにといっしょ?_x_tr_sl=ja&_x_tr_tl=en-US&_x_tr_pto=wapp">Google
             Translate</a> (or ChatGPT if you like).
@@ -78,20 +77,33 @@
 
         <table id="puni-stats-table">
             <tr>
+                <td class="stat_range stat_cell"></td>
                 <td><u>Const.</u></td>
                 <td><u>Luster</u></td>
                 <td><u>Mood</u></td>
-                <td rowspan="2"> = <img id="puni-img" src="" style="height: 100%;"> <strong><span
-                            id="puni-color"></span></strong> Puni</td>
             </tr>
             <tr>
+                <td class="stat_range stat_cell">Max</td>
                 <td><input type="text" id="const_" value="100"></td>
                 <td><input type="text" id="luster" value="100"></td>
                 <td><input type="text" id="mood" value="94"></td>
+                <td> = <img id="puni-img" src="" style="height: 100%;"> <strong><span id="puni-color"></span></strong> Puni
+                </td>
+            </tr>
+            <tr class="stat_range stat_row">
+                <td>Min</td>
+                <td><input type="text" id="const_min" value="0"></td>
+                <td><input type="text" id="luster_min" value="0"></td>
+                <td><input type="text" id="mood_min" value="0"></td>
+                <td> = <img id="puni-img-min" src="" style="height: 100%;"> <strong><span
+                            id="puni-color-min"></span></strong> Puni
+                </td>
             </tr>
         </table>
 
-        <div>Stats need to be ordered? <input type="checkbox" id="ordered">
+        <div>Stats range? <input type="checkbox" id="range"></div>
+
+        <div id="ordered_div">Stats need to be ordered? <input type="checkbox" id="ordered">
             <span class="tooltip">(?)
                 <span class="tooltiptext">Does the order of which stat has which number matter? Or is it ok that as long
                     as all three numbers appear in whichever stat?</span>
@@ -134,9 +146,10 @@
     <div id="references">
         <b><u>References:</u></b>
         <ul>
-            <li><a href="https://barrelwisdom.com/ryza/puni-raising">https://barrelwisdom.com/ryza/puni-raising</a></li>
+            <li><a href="https://barrelwisdom.com/ryza/puni-raising">Barrel Wisdom</a></li>
             <li><a
-                    href="https://docs.google.com/spreadsheets/d/197q5mN66pSpWmE2NklW4kToYs2cyD4lq8kPNrfkP72Y/edit?usp=sharing">https://docs.google.com/spreadsheets/d/197q5mN66pSpWmE2NklW4kToYs2cyD4lq8kPNrfkP72Y/edit?usp=sharing</a>
+                    href="https://docs.google.com/spreadsheets/d/197q5mN66pSpWmE2NklW4kToYs2cyD4lq8kPNrfkP72Y/edit?usp=sharing">Barrel
+                    Wisdom spreadsheet</a>
             </li>
         </ul>
     </div>

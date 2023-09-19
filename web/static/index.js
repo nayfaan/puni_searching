@@ -1,4 +1,6 @@
 var submit_button = $("#submit"),
+    range_checkbox = $("#range"),
+    ordered_checkbox = $("#ordered"),
     results_table = $("#results-table");
 
 function start_zip_worker() {
@@ -267,19 +269,41 @@ function conclude_calc() {
 }
 
 function puni_calc(settings) {
-    let [puni_target, [craftable_only, best_only, ordered, show_icons]] = settings;
+    let [puni_target, [craftable_only, best_only, ordered, show_icons, is_range], puni_target_min] = settings;
 
     let item_category_matrix = cross_item_category(craftable_only, best_only);
 
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
 
     start_zip_worker();
-    w.postMessage([puni_target, ordered, show_icons, item_category_rank_matrix]);
+    w.postMessage([puni_target, ordered, show_icons, item_category_rank_matrix, is_range, puni_target_min]);
 }
 
 function clear_results() {
     $("#results-table").text("");
 }
+
+var ordered_checkbox_cookie
+
+range_checkbox.on("change", function(){
+    if (range_checkbox.is(":checked")){
+        $(".stat_cell").css("display", "table-cell");
+        $(".stat_row").css("display", "table-row");
+
+        ordered_checkbox_cookie = ordered_checkbox.is(":checked")
+        ordered_checkbox.prop("disabled", true);
+        ordered_checkbox.prop("checked", true);
+
+        $("#ordered_div").css("display", "none");
+    }else{
+        $(".stat_range").css("display", "none");
+
+        ordered_checkbox.prop("disabled", false);
+        ordered_checkbox.prop("checked", ordered_checkbox_cookie);
+
+        $("#ordered_div").css("display", "inherit");
+    }
+});
 
 submit_button.on("click", function () {
     submit_button.prop("disabled", true);
@@ -292,13 +316,22 @@ submit_button.on("click", function () {
     let mood_val = parseInt(
         $("#mood").val());
 
+    let const_val_min = parseInt(
+        $("#const_min").val());
+    let luster_val_min = parseInt(
+        $("#luster_min").val());
+    let mood_val_min = parseInt(
+        $("#mood_min").val());
+
     let craftable_only = $("#craftable_only").is(":checked");
     let best_only = $("#best_only").is(":checked");
     let ordered = $("#ordered").is(":checked");
     let show_icons = $("#show_icons").is(":checked");
+    let is_range = $("#range").is(":checked");
 
     let puni_target = [const_val, luster_val, mood_val]
-    let settings = [puni_target, [craftable_only, best_only, ordered, show_icons]]
+    let puni_target_min = [const_val_min, luster_val_min, mood_val_min]
+    let settings = [puni_target, [craftable_only, best_only, ordered, show_icons, is_range], puni_target_min]
 
     print_header(show_icons);
     puni_calc(settings);
