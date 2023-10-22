@@ -2,6 +2,7 @@ var submit_button = $("#submit"),
     range_checkbox = $("#range"),
     ordered_checkbox = $("#ordered"),
     results_table = $("#results-table");
+var tbody;
 
 function start_zip_worker() {
     if (typeof (Worker) !== "undefined") {
@@ -11,6 +12,7 @@ function start_zip_worker() {
         w.onmessage = function (event) {
             if (event.data !== true) {
                 let [item_combo, total_score_unsorted, show_icons] = event.data
+                // @Todo: implement cooldown for print_result function
                 print_result(item_combo, total_score_unsorted, show_icons);
             }
             else conclude_calc();
@@ -76,11 +78,12 @@ function print_header(show_icons) {
             $('<tbody>')
                 .attr('id', 'results')
         );
+    thead_tr = null;
+
+    tbody = results_table.find('tbody');
 }
 
 function print_result(item_combo, total_score, show_icons) {
-    let tbody = results_table.find('tbody');
-
     tbody.append(
         $('<tr>')
             .append(
@@ -100,7 +103,6 @@ function print_result(item_combo, total_score, show_icons) {
         let item_orig_base_attr = item_orig_full_attr.splice(0, 4).filter(e => e);
 
         let item_add_attr = item_attr.filter(i => !item_orig_base_attr.includes(i))
-
 
         let img;
         if (show_icons) {
@@ -126,6 +128,7 @@ function print_result(item_combo, total_score, show_icons) {
                 $('<td>')
                     .append(img));
         }
+        img = null;
 
         tr.append(
             $('<td>')
@@ -147,6 +150,7 @@ function print_result(item_combo, total_score, show_icons) {
         }
 
         tbody.append(tr);
+        tr = null;
     }
 
     tbody
@@ -234,7 +238,7 @@ function cross_item_category_rank(item_category_matrix, best_only) {
 
 function conclude_calc() {
     stop_zip_worker();
-    let tbody = results_table.find('tbody');
+
     tbody
         .append(
             $('<tr>')
