@@ -1,5 +1,7 @@
 importScripts("./data.js"); importScripts("./itertoolsCombinations.js");
 
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+
 var complete = false;
 
 function zip(arrays) {
@@ -43,9 +45,10 @@ onmessage = function (e) {
     }
 
     let success_match = false;
+    let item_permutation = [];
 
     for (let p of permutation) {
-        let item_permutation = [];
+        item_permutation = [];
 
         for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
             item_permutation.push(zip([i, p]));
