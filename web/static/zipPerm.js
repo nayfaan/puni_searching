@@ -28,9 +28,9 @@ function sum_score(feed_list) {
     return total
 }
 
-function is_between(puni_target, puni_target_min, total_score){
+function is_between(puni_target, puni_target_min, total_score) {
     let between = true;
-    for(let i = 0; i < 3; i++){
+    for (let i = 0; i < 3; i++) {
         if (!between) continue;
         if (!(total_score[i] <= puni_target[i] && puni_target_min[i] <= total_score[i])) between = false;
     }
@@ -38,36 +38,38 @@ function is_between(puni_target, puni_target_min, total_score){
 }
 
 onmessage = function (e) {
-    [puni_target, ordered, show_icons, item_category_rank_matrix, is_range, puni_target_min] = e.data
+    [puni_target, ordered, item_category_rank_matrix, is_range, max_type, puni_target_min] = e.data;
 
     if (!ordered) {
-        puni_target.sort(function (a, b) { return a - b })
+        puni_target.sort(function (a, b) { return a - b });
     }
 
     let success_match = false;
     let item_permutation = [];
 
     for (let p of permutation) {
-        item_permutation = [];
+        if (p.length <= max_type) {
+            item_permutation = [];
 
-        for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
-            item_permutation.push(zip([i, p]));
-        }
-
-        for (item_combo of item_permutation) {
-            success_match = false;
-
-            let total_score = sum_score(item_combo),
-                total_score_unsorted = Array.from(total_score);
-
-            if (!is_range){
-                if (!ordered) total_score.sort(function (a, b) { return a - b });
-                if (JSON.stringify(total_score) == JSON.stringify(puni_target)) success_match = true;
-            }else{
-                if (is_between(puni_target, puni_target_min, total_score)) success_match = true;
+            for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
+                item_permutation.push(zip([i, p]));
             }
 
-            if (success_match) postMessage([item_combo, total_score_unsorted, show_icons]);
+            for (item_combo of item_permutation) {
+                success_match = false;
+
+                let total_score = sum_score(item_combo),
+                    total_score_unsorted = Array.from(total_score);
+
+                if (!is_range) {
+                    if (!ordered) total_score.sort(function (a, b) { return a - b });
+                    if (JSON.stringify(total_score) == JSON.stringify(puni_target)) success_match = true;
+                } else {
+                    if (is_between(puni_target, puni_target_min, total_score)) success_match = true;
+                }
+
+                if (success_match) postMessage([item_combo, total_score_unsorted]);
+            }
         }
     }
     postMessage(true);

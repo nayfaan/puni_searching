@@ -2,6 +2,7 @@ var submit_button = $("#submit"),
     range_checkbox = $("#range"),
     ordered_checkbox = $("#ordered"),
     results_table = $("#results-table");
+var show_icons = true;
 var tbody;
 
 function start_zip_worker() {
@@ -11,8 +12,7 @@ function start_zip_worker() {
         }
         w.onmessage = function (event) {
             if (event.data !== true) {
-                let [item_combo, total_score_unsorted, show_icons] = event.data
-                // @Todo: implement cooldown for print_result function
+                let [item_combo, total_score_unsorted] = event.data
                 print_result(item_combo, total_score_unsorted, show_icons);
             }
             else conclude_calc();
@@ -273,14 +273,14 @@ function conclude_calc() {
 }
 
 function puni_calc(settings) {
-    let [puni_target, [craftable_only, best_only, ordered, show_icons, is_range], puni_target_min] = settings;
+    let [puni_target, [craftable_only, best_only, ordered, is_range, max_type], puni_target_min] = settings;
 
     let item_category_matrix = cross_item_category(craftable_only, best_only);
 
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
 
     start_zip_worker();
-    w.postMessage([puni_target, ordered, show_icons, item_category_rank_matrix, is_range, puni_target_min]);
+    w.postMessage([puni_target, ordered, item_category_rank_matrix, is_range, max_type, puni_target_min]);
 }
 
 function clear_results() {
@@ -330,12 +330,13 @@ submit_button.on("click", function () {
     let craftable_only = $("#craftable_only").is(":checked");
     let best_only = $("#best_only").is(":checked");
     let ordered = $("#ordered").is(":checked");
-    let show_icons = $("#show_icons").is(":checked");
+    show_icons = $("#show_icons").is(":checked");
     let is_range = $("#range").is(":checked");
+    let max_type = parseInt($("#max_type").val());
 
     let puni_target = [const_val, luster_val, mood_val]
     let puni_target_min = [const_val_min, luster_val_min, mood_val_min]
-    let settings = [puni_target, [craftable_only, best_only, ordered, show_icons, is_range], puni_target_min]
+    let settings = [puni_target, [craftable_only, best_only, ordered, is_range, max_type], puni_target_min]
 
     print_header(show_icons);
     puni_calc(settings);
