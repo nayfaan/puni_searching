@@ -18,10 +18,32 @@ function clamp(min, num, max) {
             : num
 }
 
+function calculate_score(categories, rank_index) {
+    let [score_0, score_1, score_2] = [0, 0, 0];
+
+    for (let category of categories) {
+        let category_scores = value[category][0];
+        let multiplier = value[category][1][rank_index];
+
+        score_0 += multiplier * category_scores[0];
+        score_1 += multiplier * category_scores[1];
+        score_2 += multiplier * category_scores[2];
+    }
+
+    return [score_0, score_1, score_2]
+}
+
 function sum_score(feed_list) {
     let total = [20, 20, 20];
 
-    for (let feed of feed_list) for (let i = 0; i < 3; i++) total[i] += feed[1] * feed[0][3][i];
+    for (let feed of feed_list) {
+        [_, categories, rank_index] = feed[0];
+        score_array = calculate_score(categories, rank_index)
+
+        for (let i = 0; i < 3; i++) {
+            total[i] += feed[1] * score_array[i];
+        }
+    }
 
     for (let i = 0; i < 3; i++) total[i] = clamp(0, total[i], 100);
 
@@ -54,7 +76,8 @@ onmessage = function (e) {
             for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
                 item_permutation.push(zip([i, p]));
             }
-            
+            console.log(p, item_permutation.length, JSON.stringify(item_permutation[0]))
+
 
             for (item_combo of item_permutation) {
                 success_match = false;

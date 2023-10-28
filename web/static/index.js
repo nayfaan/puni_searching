@@ -216,18 +216,8 @@ function cross_item_category_rank(item_category_matrix, best_only) {
 
         for (let i in rank) {
             let rank_index = rank[i];
-            let [score_0, score_1, score_2] = [0, 0, 0];
 
-            for (let category of categories) {
-                let category_scores = value[category][0];
-                let multiplier = value[category][1][rank_index];
-
-                score_0 += multiplier * category_scores[0];
-                score_1 += multiplier * category_scores[1];
-                score_2 += multiplier * category_scores[2];
-            }
-
-            let item_category_rank = [name, categories, rank_index, [score_0, score_1, score_2]];
+            let item_category_rank = [name, categories, rank_index];
             item_category_rank_matrix.push(item_category_rank);
         }
     }
@@ -276,7 +266,6 @@ function puni_calc(settings) {
     
     let item_category_matrix = cross_item_category(craftable_only, best_only);
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
-    // console.log(item_category_matrix, item_category_rank_matrix)
 
     start_zip_worker();
     w.postMessage([puni_target, ordered, item_category_rank_matrix, is_range, max_type, puni_target_min]);
