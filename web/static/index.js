@@ -282,6 +282,13 @@ var ordered_checkbox_cookie
 
 range_checkbox.on("change", function () {
     if (range_checkbox.is(":checked")) {
+
+        [[$("#const_min"), $("#const_")], [$("#luster_min"), $("#luster")], [$("#mood_min"), $("#mood")]].forEach((e) => {
+            if(e[0].val() > e[1].val()){
+                e[0].val(e[1].val());
+            }
+        })
+
         $(".stat_cell").css("display", "table-cell");
         $(".stat_row").css("display", "table-row");
 
@@ -320,9 +327,9 @@ submit_button.on("click", function () {
 
     let craftable_only = $("#craftable_only").is(":checked");
     let best_only = $("#best_only").is(":checked");
-    let ordered = $("#ordered").is(":checked");
+    let ordered = ordered_checkbox.is(":checked");
     show_icons = $("#show_icons").is(":checked");
-    let is_range = $("#range").is(":checked");
+    let is_range = range_checkbox.is(":checked");
     let max_type = parseInt($("#max_type").val());
 
     let puni_target = [const_val, luster_val, mood_val]
@@ -338,14 +345,14 @@ top_btn.on("click", function () {
     window.scrollTo({ top: 0, behavior: 'smooth' })
 });
 
-function scroll_to_bottom(){
+function scroll_to_bottom() {
     let position = null
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
     const checkIfScrollIsStatic = setInterval(() => {
         if (position === window.scrollY) {
             clearInterval(checkIfScrollIsStatic)
 
-            if (!((references_div[0].getBoundingClientRect().top >= 0) && (references_div[0].getBoundingClientRect().bottom <= window.innerHeight))){
+            if (!((references_div[0].getBoundingClientRect().top >= 0) && (references_div[0].getBoundingClientRect().bottom <= window.innerHeight))) {
                 scroll_to_bottom()
             }
         }
@@ -353,6 +360,6 @@ function scroll_to_bottom(){
     }, 50)
 }
 
-btm_btn.on("click", function(){
+btm_btn.on("click", function () {
     scroll_to_bottom();
 });

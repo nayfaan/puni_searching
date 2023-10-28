@@ -73,6 +73,18 @@ const puni_colors = {
 
 const puni_order = ["Shining", "Abyss", "Big", "Flare", "Moon", "Gold", "Silver", "Stone", "Black", "Red", "Green", "Blue"];
 
+function find_opposite_pair(id) {
+    let id_pairs = [["const_", "const_min"], ["luster", "luster_min"], ["mood", "mood_min"]];
+    for (i in id_pairs) {
+        if (id_pairs[i][0] === id) {
+            return id_pairs[i][1];
+        } else if (id_pairs[i][1] === id) {
+            return id_pairs[i][0];
+        }
+    }
+    return null;
+}
+
 // Restricts input for the set of matched elements to the given inputFilter function.
 (function ($) {
     $.fn.inputFilter = function (callback) {
@@ -81,8 +93,10 @@ const puni_order = ["Shining", "Abyss", "Big", "Flare", "Moon", "Gold", "Silver"
 
             // Capping min/max values
             let check_min = true;
-            if (parseInt($("#const_").val()) < parseInt($("#const_min").val()) || parseInt($("#luster").val()) < parseInt($("#luster_min").val()) || parseInt($("#mood").val()) < parseInt($("#mood_min").val())) {
-                check_min = false;
+            if ($("#range").is(":checked")) {
+                if (parseInt($("#const_").val()) < parseInt($("#const_min").val()) || parseInt($("#luster").val()) < parseInt($("#luster_min").val()) || parseInt($("#mood").val()) < parseInt($("#mood_min").val())) {
+                    check_min = false;
+                }
             }
 
             // Processing value 
@@ -92,10 +106,27 @@ const puni_order = ["Shining", "Abyss", "Big", "Flare", "Moon", "Gold", "Silver"
                 this.oldSelectionStart = this.selectionStart;
                 this.oldSelectionEnd = this.selectionEnd;
             } else if (this.hasOwnProperty("oldValue")) {
-                // Rejected value - restore the previous one
-                this.reportValidity();
-                this.value = this.oldValue;
-                this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                if (!check_min) {
+                    // Rejected min-max pair - change to match opposite value
+                    let opposite_input = $("#" + find_opposite_pair(this.id));
+
+                    if (this.oldValue == opposite_input.val()) {
+                        this.oldValue = this.value;
+                        opposite_input.val(this.value);
+                        opposite_input.oldValue = this.value;
+                        opposite_input.oldSelectionStart = this.selectionStart;
+                        opposite_input.oldSelectionEnd = this.selectionEnd;
+                    } else {
+                        this.value = opposite_input.val();
+                    }
+
+                    this.oldSelectionStart = this.selectionStart;
+                    this.oldSelectionEnd = this.selectionEnd;
+                } else {
+                    // Rejected value - restore the previous one
+                    this.value = this.oldValue;
+                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                }
             } else {
                 // Rejected value - nothing to restore
                 this.value = "";
