@@ -1,4 +1,7 @@
 var submit_button = $("#submit"),
+    top_btn = $("#top_btn"),
+    btm_btn = $("#btm_btn"),
+    references_div = $("#references"),
     range_checkbox = $("#range"),
     ordered_checkbox = $("#ordered"),
     results_table = $("#results-table");
@@ -105,7 +108,7 @@ function print_result(item_combo, total_score, show_icons) {
         let item_orig_base_attr = item_orig_full_attr.splice(0, 4).filter(e => e !== null);
 
         let item_add_attr = item_attr.filter(i => !item_orig_base_attr.includes(i))
-        item_add_attr = item_add_attr.map(function (element){
+        item_add_attr = item_add_attr.map(function (element) {
             return category_convert[element];
         });
 
@@ -207,7 +210,7 @@ function cross_item_category(craftable_only, best_only) {
 
 function cross_item_category_rank(item_category_matrix, best_only) {
     if (best_only) var rank = [5];
-    else var rank = [5,4,3,2,1,0];
+    else var rank = [5, 4, 3, 2, 1, 0];
 
     let item_category_rank_matrix = [];
     for (let item_category of item_category_matrix) {
@@ -263,7 +266,7 @@ function conclude_calc() {
 
 function puni_calc(settings) {
     let [puni_target, [craftable_only, best_only, ordered, is_range, max_type], puni_target_min] = settings;
-    
+
     let item_category_matrix = cross_item_category(craftable_only, best_only);
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
 
@@ -277,8 +280,8 @@ function clear_results() {
 
 var ordered_checkbox_cookie
 
-range_checkbox.on("change", function(){
-    if (range_checkbox.is(":checked")){
+range_checkbox.on("change", function () {
+    if (range_checkbox.is(":checked")) {
         $(".stat_cell").css("display", "table-cell");
         $(".stat_row").css("display", "table-row");
 
@@ -287,7 +290,7 @@ range_checkbox.on("change", function(){
         ordered_checkbox.prop("checked", true);
 
         $("#ordered_div").css("display", "none");
-    }else{
+    } else {
         $(".stat_range").css("display", "none");
 
         ordered_checkbox.prop("disabled", false);
@@ -328,4 +331,28 @@ submit_button.on("click", function () {
 
     print_header(show_icons);
     puni_calc(settings);
+});
+
+
+top_btn.on("click", function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+});
+
+function scroll_to_bottom(){
+    let position = null
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    const checkIfScrollIsStatic = setInterval(() => {
+        if (position === window.scrollY) {
+            clearInterval(checkIfScrollIsStatic)
+
+            if (!((references_div[0].getBoundingClientRect().top >= 0) && (references_div[0].getBoundingClientRect().bottom <= window.innerHeight))){
+                scroll_to_bottom()
+            }
+        }
+        position = window.scrollY
+    }, 50)
+}
+
+btm_btn.on("click", function(){
+    scroll_to_bottom();
 });
