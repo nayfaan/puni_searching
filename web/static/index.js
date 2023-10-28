@@ -99,7 +99,7 @@ function print_result(item_combo, total_score, show_icons) {
                     )
             )
     );
-    for (let [item_data, item_count] of item_combo.sort(function (a, b) { return b[1] - a[1]; })) {
+    for (let [item_data, item_count] of item_combo) {
         let [item_name_index, item_attr, item_rank_index] = item_data;
         item_rank = rank_convert[item_rank_index];
         item_name = item_convert[item_name_index]
@@ -208,6 +208,21 @@ function cross_item_category(craftable_only, best_only) {
     return item_category_matrix;
 }
 
+function calculate_score(categories, rank_index) {
+    let [score_0, score_1, score_2] = [0, 0, 0];
+
+    for (let category of categories) {
+        let category_scores = value[category][0];
+        let multiplier = value[category][1][rank_index];
+
+        score_0 += multiplier * category_scores[0];
+        score_1 += multiplier * category_scores[1];
+        score_2 += multiplier * category_scores[2];
+    }
+
+    return [score_0, score_1, score_2]
+}
+
 function cross_item_category_rank(item_category_matrix, best_only) {
     if (best_only) var rank = [5];
     else var rank = [5, 4, 3, 2, 1, 0];
@@ -220,8 +235,7 @@ function cross_item_category_rank(item_category_matrix, best_only) {
         for (let i in rank) {
             let rank_index = rank[i];
 
-            let item_category_rank = [name, categories, rank_index];
-            item_category_rank_matrix.push(item_category_rank);
+            item_category_rank_matrix.push([name, categories, rank_index, calculate_score(categories, rank_index)]);
         }
     }
 
@@ -264,14 +278,28 @@ function conclude_calc() {
     submit_button.prop("disabled", false);
 }
 
+function group_score(item_category_rank_matrix){
+    let score_item_category_rank_matrix = {};
+    item_category_rank_matrix.forEach((e) => {
+        let [item_id, category_list, rank, score_matrix] = e;
+        score_matrix_string = JSON.stringify(score_matrix);
+        if (!score_item_category_rank_matrix.hasOwnProperty(score_matrix_string)){
+            score_item_category_rank_matrix[score_matrix_string] = [];
+        }
+        score_item_category_rank_matrix[score_matrix_string].push([item_id, category_list, rank]);
+    })
+    return score_item_category_rank_matrix;
+}
+
 function puni_calc(settings) {
     let [puni_target, [craftable_only, best_only, ordered, is_range, max_type], puni_target_min] = settings;
 
     let item_category_matrix = cross_item_category(craftable_only, best_only);
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
+    let score_item_category_rank_matrix = group_score(item_category_rank_matrix)
 
     start_zip_worker();
-    w.postMessage([puni_target, ordered, item_category_rank_matrix, is_range, max_type, puni_target_min]);
+    w.postMessage([puni_target, ordered, score_item_category_rank_matrix, is_range, max_type, puni_target_min]);
 }
 
 function clear_results() {
@@ -284,7 +312,7 @@ range_checkbox.on("change", function () {
     if (range_checkbox.is(":checked")) {
 
         [[$("#const_min"), $("#const_")], [$("#luster_min"), $("#luster")], [$("#mood_min"), $("#mood")]].forEach((e) => {
-            if(e[0].val() > e[1].val()){
+            if (e[0].val() > e[1].val()) {
                 e[0].val(e[1].val());
             }
         })

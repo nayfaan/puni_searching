@@ -52,8 +52,8 @@
 }
 .page_navigate_button_container{
     position: fixed;
-    bottom: 5px;
-    right: 5px;
+    bottom: 1.618vw;
+    right: 1.618vw;
     z-index: 999;
 }
 
