@@ -147,12 +147,47 @@ function find_opposite_pair(id) {
             update_puni_colors();
         });
     };
+
+    $.fn.inputFilter2 = function (callback) {
+        return this.on("input keydown keyup mousedown mouseup select contextmenu drop focusout", function (e) {
+            let callback_value = callback(this.value);
+
+            // Processing value 
+            if (callback_value) {
+                // Accepted value
+                this.oldValue = this.value;
+                this.oldSelectionStart = this.selectionStart;
+                this.oldSelectionEnd = this.selectionEnd;
+            } else if (this.hasOwnProperty("oldValue")) {
+                    // Rejected value - restore the previous one
+                    this.value = this.oldValue;
+                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+            } else {
+                // Rejected value - nothing to restore
+                this.value = "";
+            }
+
+            if (this.value == "") this.value = 1;
+            else {
+                let stat_val = parseInt(this.value);
+                if (stat_val > 6) this.value = 6;
+                if (stat_val < 1) this.value = 1;
+            }
+
+            this.value = parseInt(this.value);
+        });
+    };
 }(jQuery));
 
 $(document).ready(function () {
     update_puni_colors();
 
     $("#puni-stats-table input").inputFilter(function (value) {
+        let regex_test = /^\d*$/.test(value);
+        return regex_test;    // Allowing digits only
+    });
+
+    $("#max_type").inputFilter2(function (value) {
         let regex_test = /^\d*$/.test(value);
         return regex_test;    // Allowing digits only
     });
