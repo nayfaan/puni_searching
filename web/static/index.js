@@ -97,12 +97,17 @@ function print_result(item_combo, total_score, show_icons) {
             )
     );
     for (let [item_data, item_count] of item_combo.sort(function (a, b) { return b[1] - a[1]; })) {
-        let [item_name, item_attr, item_rank] = item_data;
+        let [item_name_index, item_attr, item_rank_index] = item_data;
+        item_rank = rank_convert[item_rank_index];
+        item_name = item_convert[item_name_index]
 
-        let item_orig_full_attr = Array.from(items[item_name]);
-        let item_orig_base_attr = item_orig_full_attr.splice(0, 4).filter(e => e);
+        let item_orig_full_attr = Array.from(items[item_name_index]);
+        let item_orig_base_attr = item_orig_full_attr.splice(0, 4).filter(e => e !== null);
 
         let item_add_attr = item_attr.filter(i => !item_orig_base_attr.includes(i))
+        item_add_attr = item_add_attr.map(function (element){
+            return category_convert[element];
+        });
 
         let img;
         if (show_icons) {
@@ -167,13 +172,14 @@ function print_result(item_combo, total_score, show_icons) {
 function cross_item_category(craftable_only, best_only) {
     let item_category_matrix = [[]];
     for (let item in items) {
+        item = parseInt(item)
         if (!(craftable_only && !craftables.includes(item))) {
             let data = items[item];
 
             let all_attr_subset
             if (!best_only) {
-                let base_attr = data.slice(0, 4).filter(e => e);
-                let add_attr = data.slice(4, 6).filter(e => e);
+                let base_attr = data.slice(0, 4).filter(e => e !== null);
+                let add_attr = data.slice(4, 6).filter(e => e !== null);
 
                 all_attr_subset = [[item].concat(base_attr)];
 
@@ -181,13 +187,13 @@ function cross_item_category(craftable_only, best_only) {
                     for (let L = 1; L <= add_attr.length; L++) {
                         for (let add_attr_subset of itertoolsCombinations(add_attr, L)) {
                             all_attr_subset.push(
-                                [item].concat(base_attr, add_attr_subset.filter(e => e)))
+                                [item].concat(base_attr, add_attr_subset.filter(e => e !== null)))
                         }
                     }
                 }
             }
             else {
-                let full_attr = data.filter(e => e);
+                let full_attr = data.filter(e => e !== null);
                 all_attr_subset = [[item].concat(full_attr)];
             }
 
@@ -200,23 +206,16 @@ function cross_item_category(craftable_only, best_only) {
 }
 
 function cross_item_category_rank(item_category_matrix, best_only) {
-    if (best_only) var rank = { "S": 5 };
-    else var rank = {
-        S: 5,
-        A: 4,
-        B: 3,
-        C: 2,
-        D: 1,
-        E: 0
-    };
+    if (best_only) var rank = [5];
+    else var rank = [5,4,3,2,1,0];
 
     let item_category_rank_matrix = [];
     for (let item_category of item_category_matrix) {
         let categories = item_category.splice(1);
         let name = item_category[0];
 
-        for (let rank_name in rank) {
-            let rank_index = rank[rank_name];
+        for (let i in rank) {
+            let rank_index = rank[i];
             let [score_0, score_1, score_2] = [0, 0, 0];
 
             for (let category of categories) {
@@ -228,7 +227,7 @@ function cross_item_category_rank(item_category_matrix, best_only) {
                 score_2 += multiplier * category_scores[2];
             }
 
-            let item_category_rank = [name, categories, rank_name, [score_0, score_1, score_2]];
+            let item_category_rank = [name, categories, rank_index, [score_0, score_1, score_2]];
             item_category_rank_matrix.push(item_category_rank);
         }
     }
@@ -262,7 +261,7 @@ function conclude_calc() {
                                         .append(
                                             $('<span>')
                                                 .addClass("tooltiptext")
-                                                .text("If the table is empty (unlikely), there are no valid results.")
+                                                .text("If the table is empty, there are no valid results for your settings. Please alter your settings and try again.")
                                         )
                                 )
                         )
@@ -274,10 +273,10 @@ function conclude_calc() {
 
 function puni_calc(settings) {
     let [puni_target, [craftable_only, best_only, ordered, is_range, max_type], puni_target_min] = settings;
-
+    
     let item_category_matrix = cross_item_category(craftable_only, best_only);
-
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
+    // console.log(item_category_matrix, item_category_rank_matrix)
 
     start_zip_worker();
     w.postMessage([puni_target, ordered, item_category_rank_matrix, is_range, max_type, puni_target_min]);

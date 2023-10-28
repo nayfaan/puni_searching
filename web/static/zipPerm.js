@@ -54,6 +54,7 @@ onmessage = function (e) {
             for (let i of itertoolsCombinations(item_category_rank_matrix, p.length)) {
                 item_permutation.push(zip([i, p]));
             }
+            
 
             for (item_combo of item_permutation) {
                 success_match = false;
