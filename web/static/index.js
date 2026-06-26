@@ -10,6 +10,9 @@ var submit_button = $("#submit"),
 var show_icons = true;
 var tbody;
 
+var SETTINGS_KEY = "puni_searching.settings";
+var suppress_save = false;
+
 var workers = [];
 var cur_tier = 0;
 var max_tier = 6;
@@ -35,8 +38,8 @@ function reset_search_state() {
 
 function on_worker_message(event) {
     let data = event.data;
-    if (data.type === "result") {
-        result_buffer.push(data);
+    if (data.type === "results") {
+        for (let i = 0; i < data.batch.length; i++) result_buffer.push(data.batch[i]);
         schedule_flush();
     } else if (data.type === "tierdone") {
         tier_pending--;
@@ -84,8 +87,12 @@ function flush_results() {
 
 function set_running(is_running) {
     submit_button.prop("disabled", is_running);
-    if (is_running) stop_button.show();
-    else stop_button.hide();
+    if (is_running) {
+        stop_button.show();
+        reset_button.hide();
+    } else {
+        stop_button.hide();
+    }
 }
 
 function print_array(arr) {
@@ -334,6 +341,7 @@ function conclude_calc() {
         )
 
     set_running(false);
+    reset_button.show();
 }
 
 function group_score(item_category_rank_matrix){
@@ -389,6 +397,88 @@ function clear_results() {
     $("#results-table").text("");
 }
 
+function save_settings() {
+    if (suppress_save) return;
+
+    let is_range = range_checkbox.is(":checked");
+    let settings = {
+        const_: $("#const_").val(),
+        luster: $("#luster").val(),
+        mood: $("#mood").val(),
+        const_min: $("#const_min").val(),
+        luster_min: $("#luster_min").val(),
+        mood_min: $("#mood_min").val(),
+        craftable_only: $("#craftable_only").is(":checked"),
+        best_only: $("#best_only").is(":checked"),
+        range: is_range,
+        ordered: is_range ? !!ordered_checkbox_cookie : ordered_checkbox.is(":checked"),
+        show_icons: $("#show_icons").is(":checked"),
+        max_type: $("#max_type").val()
+    };
+
+    try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    } catch (e) { }
+}
+
+function load_settings() {
+    let raw = null;
+    try {
+        raw = localStorage.getItem(SETTINGS_KEY);
+    } catch (e) {
+        return;
+    }
+    if (!raw) return;
+
+    let settings = null;
+    try {
+        settings = JSON.parse(raw);
+    } catch (e) {
+        return;
+    }
+    if (!settings || typeof settings !== "object") return;
+
+    suppress_save = true;
+
+    function set_stat(id, value) {
+        value = parseInt(value);
+        if (isNaN(value)) return;
+        if (value < 0) value = 0;
+        if (value > 100) value = 100;
+        $(id).val(value);
+    }
+
+    if ("const_" in settings) set_stat("#const_", settings.const_);
+    if ("luster" in settings) set_stat("#luster", settings.luster);
+    if ("mood" in settings) set_stat("#mood", settings.mood);
+    if ("const_min" in settings) set_stat("#const_min", settings.const_min);
+    if ("luster_min" in settings) set_stat("#luster_min", settings.luster_min);
+    if ("mood_min" in settings) set_stat("#mood_min", settings.mood_min);
+
+    if ("max_type" in settings) {
+        let max_type = parseInt(settings.max_type);
+        if (!isNaN(max_type)) {
+            if (max_type < 1) max_type = 1;
+            if (max_type > 6) max_type = 6;
+            $("#max_type").val(max_type);
+        }
+    }
+
+    if ("craftable_only" in settings) $("#craftable_only").prop("checked", !!settings.craftable_only);
+    if ("best_only" in settings) $("#best_only").prop("checked", !!settings.best_only);
+    if ("show_icons" in settings) $("#show_icons").prop("checked", !!settings.show_icons);
+    if ("ordered" in settings) ordered_checkbox.prop("checked", !!settings.ordered);
+
+    ordered_checkbox_cookie = ordered_checkbox.is(":checked");
+
+    if ("range" in settings) range_checkbox.prop("checked", !!settings.range);
+    range_checkbox.trigger("change");
+
+    update_puni_colors();
+
+    suppress_save = false;
+}
+
 var ordered_checkbox_cookie
 
 range_checkbox.on("change", function () {
@@ -421,6 +511,7 @@ range_checkbox.on("change", function () {
 submit_button.on("click", function () {
     set_running(true);
     clear_results();
+    save_settings();
 
     let const_val = parseInt(
         $("#const_").val());
@@ -454,25 +545,7 @@ submit_button.on("click", function () {
 function stop_calc() {
     reset_search_state();
     set_running(false);
-}
-
-function reset_inputs() {
-    $("#const_").val(100);
-    $("#luster").val(100);
-    $("#mood").val(94);
-    $("#const_min").val(0);
-    $("#luster_min").val(0);
-    $("#mood_min").val(0);
-
-    $("#craftable_only").prop("checked", true);
-    $("#best_only").prop("checked", true);
-    $("#show_icons").prop("checked", true);
-    $("#max_type").val(6);
-
-    $("#range").prop("checked", false).trigger("change");
-    ordered_checkbox.prop("checked", false);
-
-    update_puni_colors();
+    reset_button.show();
 }
 
 stop_button.on("click", function () {
@@ -480,9 +553,9 @@ stop_button.on("click", function () {
 });
 
 reset_button.on("click", function () {
-    stop_calc();
+    reset_search_state();
     clear_results();
-    reset_inputs();
+    reset_button.hide();
 });
 
 
@@ -507,4 +580,10 @@ function scroll_to_bottom() {
 
 btm_btn.on("click", function () {
     scroll_to_bottom();
+});
+
+$("#calc-frame").on("change", "input", save_settings);
+
+$(function () {
+    load_settings();
 });

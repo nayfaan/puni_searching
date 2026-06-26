@@ -12,9 +12,23 @@ var low_band;
 var high_band;
 var worker_count;
 var worker_index;
+var emit_buffer = [];
+var EMIT_BATCH = 2000;
 
 function clamp(min, num, max) {
     return num <= min ? min : num >= max ? max : num;
+}
+
+function emit_result(item_combo, total_score_unsorted) {
+    emit_buffer.push({ item_combo: item_combo, total_score_unsorted: total_score_unsorted });
+    if (emit_buffer.length >= EMIT_BATCH) flush_emit();
+}
+
+function flush_emit() {
+    if (emit_buffer.length) {
+        postMessage({ type: "results", batch: emit_buffer });
+        emit_buffer = [];
+    }
 }
 
 function encode_vec(v) {
@@ -171,7 +185,7 @@ function post_success_match(condensed_score_list_repeat, total_score_unsorted) {
             item_combo.push(item_data);
         }
 
-        postMessage({ type: "result", item_combo: item_combo, total_score_unsorted: total_score_unsorted });
+        emit_result(item_combo, total_score_unsorted);
     }
 }
 
@@ -273,6 +287,7 @@ function search_tier(k) {
         rec(0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
+    flush_emit();
     postMessage({ type: "tierdone", k: k });
 }
 
