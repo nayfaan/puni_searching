@@ -20,7 +20,7 @@ var tier_pending = 0;
 var result_buffer = [];
 var flush_scheduled = false;
 var search_finalizing = false;
-var RENDER_BATCH = 150;
+var RENDER_BATCH = 1000;
 
 function terminate_workers() {
     for (let wk of workers) wk.terminate();
@@ -69,11 +69,15 @@ function flush_results() {
     flush_scheduled = false;
 
     let n = Math.min(result_buffer.length, RENDER_BATCH);
-    for (let i = 0; i < n; i++) {
-        let d = result_buffer[i];
-        print_result(d.item_combo, d.total_score_unsorted, show_icons);
+    if (n) {
+        let html = "";
+        for (let i = 0; i < n; i++) {
+            let d = result_buffer[i];
+            html += result_html(d.item_combo, d.total_score_unsorted, show_icons);
+        }
+        tbody[0].insertAdjacentHTML("beforeend", html);
+        result_buffer.splice(0, n);
     }
-    if (n) result_buffer.splice(0, n);
 
     if (result_buffer.length) {
         schedule_flush();
@@ -151,90 +155,49 @@ function print_header(show_icons) {
     tbody = results_table.find('tbody');
 }
 
-function print_result(item_combo, total_score, show_icons) {
-    tbody.append(
-        $('<tr>')
-            .append(
-                $('<td>')
-                    .attr('colspan', '100%')
-                    .css({ 'text-align': 'left', 'color': 'silver' })
-                    .append(
-                        $('<b>')
-                            .text("Score: " + print_array(total_score))
-                    )
-            )
-    );
+function esc_html(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function esc_attr(s) {
+    return esc_html(s).replace(/"/g, "&quot;");
+}
+
+function result_html(item_combo, total_score, show_icons) {
+    let html = '<tr><td colspan="100%" style="text-align:left;color:silver"><b>Score: ' + esc_html(print_array(total_score)) + '</b></td></tr>';
+
     for (let [item_data, item_count] of item_combo) {
         let [item_name_index, item_attr, item_rank_index] = item_data;
-        item_rank = rank_convert[item_rank_index];
-        item_name = item_convert[item_name_index]
+        let item_rank = rank_convert[item_rank_index];
+        let item_name = item_convert[item_name_index];
 
         let item_orig_full_attr = Array.from(items[item_name_index]);
         let item_orig_base_attr = item_orig_full_attr.splice(0, 4).filter(e => e !== null);
 
-        let item_add_attr = item_attr.filter(i => !item_orig_base_attr.includes(i))
+        let item_add_attr = item_attr.filter(i => !item_orig_base_attr.includes(i));
         item_add_attr = item_add_attr.map(function (element) {
             return category_convert[element];
         });
 
-        let img;
-        if (show_icons) {
-            let img_src = "./web/static/images/items/" + item_name.toLowerCase().replace(/[\s']/g, "-") + ".webp"
-            img = $('<img>')
-                .addClass("item_thumb")
-                .attr('src', img_src)
-                .attr('onerror', "this.onerror=null; this.src='./web/static/images/404.webp'");
-        }
-
-        let tr = $('<tr>');
-        tr.append(
-            $('<td>')
-                .text(item_count)
-        )
-            .append(
-                $('<td>')
-                    .text(" * ")
-            );
+        html += '<tr><td>' + esc_html(item_count) + '</td><td> * </td>';
 
         if (show_icons) {
-            tr.append(
-                $('<td>')
-                    .append(img));
+            let img_src = "./web/static/images/items/" + item_name.toLowerCase().replace(/[\s']/g, "-") + ".webp";
+            html += '<td><img class="item_thumb" loading="lazy" src="' + esc_attr(img_src) + '" onerror="this.onerror=null; this.src=\'./web/static/images/404.webp\'"></td>';
         }
-        img = null;
 
-        tr.append(
-            $('<td>')
-                .text(item_name)
-        ).append(
-            $('<td>')
-                .css("color", rank_color[item_rank])
-                .append(
-                    $('<b>')
-                        .text("(" + item_rank + ")")
-                )
-        );
+        html += '<td>' + esc_html(item_name) + '</td>';
+        html += '<td style="color:' + esc_attr(rank_color[item_rank]) + '"><b>(' + esc_html(item_rank) + ')</b></td>';
 
         if (item_add_attr.length) {
-            tr.append(
-                $('<td>')
-                    .text(item_add_attr.join(" "))
-            );
+            html += '<td>' + esc_html(item_add_attr.join(" ")) + '</td>';
         }
 
-        tbody.append(tr);
-        tr = null;
+        html += '</tr>';
     }
 
-    tbody
-        .append(
-            $('<tr>')
-                .append(
-                    $('<td>')
-                        .attr('colspan', '100%')
-                        .css({ "border-top": "2px solid black", "height": "1.5em" })
-                )
-        )
+    html += '<tr><td colspan="100%" style="border-top:2px solid black;height:1.5em"></td></tr>';
+    return html;
 }
 
 function cross_item_category(craftable_only, best_only) {
