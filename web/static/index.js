@@ -1,4 +1,6 @@
 var submit_button = $("#submit"),
+    reset_button = $("#reset"),
+    stop_button = $("#stop"),
     top_btn = $("#top_btn"),
     btm_btn = $("#btm_btn"),
     references_div = $("#references"),
@@ -28,6 +30,12 @@ function start_zip_worker() {
 function stop_zip_worker() {
     w.terminate();
     w = undefined;
+}
+
+function set_running(is_running) {
+    submit_button.prop("disabled", is_running);
+    if (is_running) stop_button.show();
+    else stop_button.hide();
 }
 
 function print_array(arr) {
@@ -275,7 +283,7 @@ function conclude_calc() {
                 )
         )
 
-    submit_button.prop("disabled", false);
+    set_running(false);
 }
 
 function group_score(item_category_rank_matrix){
@@ -336,7 +344,7 @@ range_checkbox.on("change", function () {
 });
 
 submit_button.on("click", function () {
-    submit_button.prop("disabled", true);
+    set_running(true);
     clear_results();
 
     let const_val = parseInt(
@@ -366,6 +374,42 @@ submit_button.on("click", function () {
 
     print_header(show_icons);
     puni_calc(settings);
+});
+
+function stop_calc() {
+    if (typeof w !== "undefined") {
+        stop_zip_worker();
+    }
+    set_running(false);
+}
+
+function reset_inputs() {
+    $("#const_").val(100);
+    $("#luster").val(100);
+    $("#mood").val(94);
+    $("#const_min").val(0);
+    $("#luster_min").val(0);
+    $("#mood_min").val(0);
+
+    $("#craftable_only").prop("checked", true);
+    $("#best_only").prop("checked", true);
+    $("#show_icons").prop("checked", true);
+    $("#max_type").val(6);
+
+    $("#range").prop("checked", false).trigger("change");
+    ordered_checkbox.prop("checked", false);
+
+    update_puni_colors();
+}
+
+stop_button.on("click", function () {
+    stop_calc();
+});
+
+reset_button.on("click", function () {
+    stop_calc();
+    clear_results();
+    reset_inputs();
 });
 
 
