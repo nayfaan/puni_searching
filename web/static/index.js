@@ -10,26 +10,76 @@ var submit_button = $("#submit"),
 var show_icons = true;
 var tbody;
 
-function start_zip_worker() {
-    if (typeof (Worker) !== "undefined") {
-        if (typeof (w) == "undefined") {
-            w = new Worker("./web/static/zipPerm.js");
-        }
-        w.onmessage = function (event) {
-            if (event.data !== true) {
-                let [item_combo, total_score_unsorted] = event.data
-                print_result(item_combo, total_score_unsorted, show_icons);
-            }
-            else conclude_calc();
-        };
-    } else {
-        results_table.text("ERROR: Web Worker support required. Please use a more updated browser.");
+var workers = [];
+var cur_tier = 0;
+var max_tier = 6;
+var tier_pending = 0;
+var result_buffer = [];
+var flush_scheduled = false;
+var search_finalizing = false;
+var RENDER_BATCH = 150;
+
+function terminate_workers() {
+    for (let wk of workers) wk.terminate();
+    workers = [];
+}
+
+function reset_search_state() {
+    terminate_workers();
+    result_buffer = [];
+    flush_scheduled = false;
+    search_finalizing = false;
+    tier_pending = 0;
+    cur_tier = 0;
+}
+
+function on_worker_message(event) {
+    let data = event.data;
+    if (data.type === "result") {
+        result_buffer.push(data);
+        schedule_flush();
+    } else if (data.type === "tierdone") {
+        tier_pending--;
+        if (tier_pending <= 0) dispatch_tier(cur_tier + 1);
     }
 }
 
-function stop_zip_worker() {
-    w.terminate();
-    w = undefined;
+function dispatch_tier(k) {
+    if (k > max_tier || workers.length === 0) {
+        terminate_workers();
+        search_finalizing = true;
+        schedule_flush();
+        return;
+    }
+    cur_tier = k;
+    tier_pending = workers.length;
+    for (let wk of workers) wk.postMessage({ cmd: "tier", k: k });
+}
+
+function schedule_flush() {
+    if (flush_scheduled) return;
+    flush_scheduled = true;
+    setTimeout(flush_results, 0);
+}
+
+function flush_results() {
+    flush_scheduled = false;
+
+    let n = Math.min(result_buffer.length, RENDER_BATCH);
+    for (let i = 0; i < n; i++) {
+        let d = result_buffer[i];
+        print_result(d.item_combo, d.total_score_unsorted, show_icons);
+    }
+    if (n) result_buffer.splice(0, n);
+
+    if (result_buffer.length) {
+        schedule_flush();
+        return;
+    }
+    if (search_finalizing) {
+        search_finalizing = false;
+        conclude_calc();
+    }
 }
 
 function set_running(is_running) {
@@ -251,7 +301,7 @@ function cross_item_category_rank(item_category_matrix, best_only) {
 }
 
 function conclude_calc() {
-    stop_zip_worker();
+    terminate_workers();
 
     tbody
         .append(
@@ -302,12 +352,37 @@ function group_score(item_category_rank_matrix){
 function puni_calc(settings) {
     let [puni_target, [craftable_only, best_only, ordered, is_range, max_type], puni_target_min] = settings;
 
+    if (typeof (Worker) === "undefined") {
+        results_table.text("ERROR: Web Worker support required. Please use a more updated browser.");
+        set_running(false);
+        return;
+    }
+
     let item_category_matrix = cross_item_category(craftable_only, best_only);
     let item_category_rank_matrix = cross_item_category_rank(item_category_matrix, best_only);
     let score_item_category_rank_matrix = group_score(item_category_rank_matrix)
 
-    start_zip_worker();
-    w.postMessage([puni_target, ordered, score_item_category_rank_matrix, is_range, max_type, puni_target_min]);
+    let worker_count = Math.min(navigator.hardwareConcurrency || 4, 12);
+
+    reset_search_state();
+    for (let i = 0; i < worker_count; i++) {
+        let wk = new Worker("./web/static/zipPerm.js");
+        wk.onmessage = on_worker_message;
+        wk.postMessage({
+            cmd: "init",
+            score_item_category_rank_matrix: score_item_category_rank_matrix,
+            puni_target: puni_target,
+            puni_target_min: puni_target_min,
+            ordered: ordered,
+            is_range: is_range,
+            worker_count: worker_count,
+            worker_index: i
+        });
+        workers.push(wk);
+    }
+
+    max_tier = max_type;
+    dispatch_tier(1);
 }
 
 function clear_results() {
@@ -377,9 +452,7 @@ submit_button.on("click", function () {
 });
 
 function stop_calc() {
-    if (typeof w !== "undefined") {
-        stop_zip_worker();
-    }
+    reset_search_state();
     set_running(false);
 }
 
