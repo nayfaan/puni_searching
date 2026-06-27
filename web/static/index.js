@@ -3,12 +3,10 @@ var submit_button = $("#submit"),
     stop_button = $("#stop"),
     top_btn = $("#top_btn"),
     btm_btn = $("#btm_btn"),
-    references_div = $("#references"),
     range_checkbox = $("#range"),
     ordered_checkbox = $("#ordered"),
     results_table = $("#results-table");
 var show_icons = true;
-var tbody;
 
 var SETTINGS_KEY = "puni_searching.settings";
 var suppress_save = false;
@@ -73,9 +71,17 @@ function flush_results() {
         let html = "";
         for (let i = 0; i < n; i++) {
             let d = result_buffer[i];
-            html += result_html(d.item_combo, d.total_score_unsorted, show_icons);
+            try {
+                html += result_html(d.item_combo, d.total_score_unsorted, show_icons);
+            } catch (e) {
+                console.error("result render error", e);
+            }
         }
-        tbody[0].insertAdjacentHTML("beforeend", html);
+        try {
+            results_table[0].insertAdjacentHTML("beforeend", html);
+        } catch (e) {
+            console.error("result insert error", e);
+        }
         result_buffer.splice(0, n);
     }
 
@@ -146,13 +152,8 @@ function print_header(show_icons) {
                 .append(
                     thead_tr
                 )
-        ).append(
-            $('<tbody>')
-                .attr('id', 'results')
         );
     thead_tr = null;
-
-    tbody = results_table.find('tbody');
 }
 
 function esc_html(s) {
@@ -164,7 +165,7 @@ function esc_attr(s) {
 }
 
 function result_html(item_combo, total_score, show_icons) {
-    let html = '<tr><td colspan="100%" style="text-align:left;color:silver"><b>Score: ' + esc_html(print_array(total_score)) + '</b></td></tr>';
+    let html = '<tbody class="result-block"><tr><td colspan="100%" class="result-score"><b>Score: ' + esc_html(print_array(total_score)) + '</b></td></tr>';
 
     for (let [item_data, item_count] of item_combo) {
         let [item_name_index, item_attr, item_rank_index] = item_data;
@@ -187,7 +188,7 @@ function result_html(item_combo, total_score, show_icons) {
         }
 
         html += '<td>' + esc_html(item_name) + '</td>';
-        html += '<td style="color:' + esc_attr(rank_color[item_rank]) + '"><b>(' + esc_html(item_rank) + ')</b></td>';
+        html += '<td class="rank-' + esc_attr(item_rank) + '"><b>(' + esc_html(item_rank) + ')</b></td>';
 
         if (item_add_attr.length) {
             html += '<td>' + esc_html(item_add_attr.join(" ")) + '</td>';
@@ -196,7 +197,7 @@ function result_html(item_combo, total_score, show_icons) {
         html += '</tr>';
     }
 
-    html += '<tr><td colspan="100%" style="border-top:2px solid black;height:1.5em"></td></tr>';
+    html += '<tr class="result-sep"><td colspan="100%"></td></tr></tbody>';
     return html;
 }
 
@@ -273,13 +274,13 @@ function cross_item_category_rank(item_category_matrix, best_only) {
 function conclude_calc() {
     terminate_workers();
 
-    tbody
+    let end_tbody = $('<tbody>')
         .append(
             $('<tr>')
+                .addClass("result-spacer")
                 .append(
                     $('<td>')
                         .attr('colspan', '100%')
-                        .css({ "height": "1.5em" })
                 )
         )
         .append(
@@ -301,7 +302,9 @@ function conclude_calc() {
                                 )
                         )
                 )
-        )
+        );
+
+    results_table.append(end_tbody);
 
     set_running(false);
     reset_button.show();
@@ -527,18 +530,7 @@ top_btn.on("click", function () {
 });
 
 function scroll_to_bottom() {
-    let position = null
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-    const checkIfScrollIsStatic = setInterval(() => {
-        if (position === window.scrollY) {
-            clearInterval(checkIfScrollIsStatic)
-
-            if (!((references_div[0].getBoundingClientRect().top >= 0) && (references_div[0].getBoundingClientRect().bottom <= window.innerHeight))) {
-                scroll_to_bottom()
-            }
-        }
-        position = window.scrollY
-    }, 50)
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 }
 
 btm_btn.on("click", function () {

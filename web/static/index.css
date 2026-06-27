@@ -50,6 +50,32 @@
 .item_thumb {
     height: 1em;
 }
+
+.result-block {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 40px;
+}
+
+.result-score {
+    text-align: left;
+    color: silver;
+}
+
+.result-sep td {
+    border-top: 2px solid black;
+    height: 1.5em;
+}
+
+.result-spacer td {
+    height: 1.5em;
+}
+
+.rank-S { color: #e6bf5a; }
+.rank-A { color: #76b3ab; }
+.rank-B { color: #c56360; }
+.rank-C { color: #5c6086; }
+.rank-D { color: #59693a; }
+.rank-E { color: #765729; }
 .page_navigate_button_container{
     position: fixed;
     bottom: 1.618vw;
